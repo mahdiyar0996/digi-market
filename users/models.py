@@ -45,30 +45,33 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
-    username = models.CharField(max_length=55, unique=True, validators=[valid_username()],
+    username = models.CharField('نام کاربری', max_length=55, unique=True,null=True, validators=[valid_username()],
                                 error_messages={'unique': 'کاربری با این نام وجود دارد',
                                                 'invalid': 'نام کاربری باید از حروف,اعداد و ـ باشد'})
-    email = models.EmailField(max_length=128, unique=True,
+    email = models.EmailField('ایمیل' ,max_length=128, unique=True,null=True,
                               validators=[valid_email()],
                               error_messages={'unique': 'کاربری با این ایمیل وجود دارد',
                                               'invalid': 'لطفا یک ایمیل معتبر وارد کنید'})
-    phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True,
+    phone_number = models.CharField('شماره موبایل', max_length=20, unique=True, blank=True, null=True,
                                     validators=[valid_phone_number()],
                                     error_messages={'unique': 'این شماره قبلا انتخاب شده است',
                                                     'invalid': 'شماره وارد شده نا معتبر است'})
-    first_name = models.CharField(max_length=55, null=True, blank=True)
-    last_name = models.CharField(max_length=55, blank=True, null=True)
-    city = models.CharField(max_length=55, blank=True, null=True, db_index=True)
-    address = models.TextField(max_length=555, blank=True, null=True)
-    is_superuser = models.BooleanField(default=False, db_index=True)
-    is_staff = models.BooleanField(default=False, db_index=True)
-    ipaddress = models.GenericIPAddressField(blank=True, null=True, db_index=True)
+    credits = models.BigIntegerField('موجودی' , max_length=30, null=True, blank=True)
+    password = models.CharField('رمز عبور',max_length=255, validators=[valid_password()],
+                                error_messages={'invalid': 'رمز کاربری باید ۸ کاراکتر یا بیشتر باشد و یک حرف بزرگ داشته باشد'})
+    city = models.CharField('شهر',max_length=55, blank=True, null=True, db_index=True)
+    address = models.TextField('ادرس', max_length=555, blank=True, null=True)
+    is_superuser = models.BooleanField('ادمین', default=False, db_index=True)
+    is_staff = models.BooleanField('کارکنان', default=False, db_index=True)
+    ipaddress = models.GenericIPAddressField('ایپی ادرس', blank=True, null=True, db_index=True)
     last_password_reset = models.DateTimeField(null=True, blank=True)
     objects = UserManager()
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email']
     date_joined = None
+    first_name = None
+    last_name = None
     class Meta:
         db_table = 'users'
         verbose_name = 'user'
@@ -81,3 +84,27 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
 
     def active_users(self):
         return self.objects.filter(is_active=True)
+
+    # def save(self):
+    #     self.profile.objects.create(first_name=self.username)
+    #     return super().save()
+
+class Profile(models.Model):
+    key = models.OneToOneField(User, related_name='%(class)s', blank=True, null=True, on_delete=models.CASCADE)
+    avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='media/users/profile/',
+                               default='media/users/profile/default.jpg')
+    first_name = models.CharField('نام', max_length=55, null=True, blank=True)
+    last_name = models.CharField('نام خانوادگی', max_length=55, blank=True, null=True)
+    birthday = models.DateTimeField('تاریخ تولد', blank=True, null=True)
+    job = models.CharField('شغل', blank=True, null=True, max_length=55)
+    updated_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'profiles'
+        verbose_name = 'profile'
+        verbose_name_plural = 'profiles'
+
+
+    def __str__(self):
+        return self.key.username
+
+

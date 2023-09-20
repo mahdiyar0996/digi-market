@@ -2,7 +2,7 @@ import re
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, BaseUserCreationForm as BaseForm
-from .models import User
+from .models import User, Profile
 from re import search
 from django.core.validators import ValidationError
 from utils.validators import valid_email, valid_username, valid_password, valid_phone_number
@@ -76,9 +76,8 @@ class RegisterForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=255, required=True,
                                error_messages={'unique': 'این نام کاربری قبلا انتخاب شده است'})
-    password = forms.CharField(max_length=55, required=True, validators=[valid_password()],
-                               error_messages={'invalid': 'رمز عبور باید حداقل ۸ کاراکتر و یک حرف بزرگ داشته باشد'})
-    remember = forms.BooleanField(widget=forms.CheckboxInput)
+    password = forms.CharField(max_length=55, required=True)
+    remember = forms.BooleanField(widget=forms.CheckboxInput, required=False)
 
 
     def clean_username(self):
@@ -93,11 +92,6 @@ class LoginForm(forms.Form):
             if not validate:
                 raise ValidationError("نام کاربری نباید از حروف !٬#$%^&*()باشد")
         return username
-
-
-
-
-
 
 
 class PasswordResetSendTokenForm(forms.Form):
@@ -115,3 +109,15 @@ class PasswordResetForm(forms.Form):
                                 required=True,
                                 widget=forms.PasswordInput, )
 
+
+class UserForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'phone_number', 'city', 'address']
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['first_name', 'last_name', 'birthday', 'job']

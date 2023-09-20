@@ -1,14 +1,21 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth.decorators import login_required
 from .views import (RegisterView,
                     UserActivationView,
                     LoginView,
+                    Logout,
                     PasswordResetTokenView,
-                    PasswordResetCompleteView)
+                    PasswordResetCompleteView,
+                    ProfileView,
+                    ProfileChangeView)
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('activate/<str:uidb64>/<str:token>/', UserActivationView.as_view(), name='email-activate'),
     path('login/', LoginView.as_view(), name='login'),
+    path('logout/', Logout.as_view(), name='logout'),
     path('users/account-recovery/', PasswordResetTokenView.as_view(), name='account-recovery'),
-    path('users/password-reset/<str:uidb64>/<str:token>/', PasswordResetCompleteView.as_view(), name='password-reset')
+    path('users/password-reset/<str:uidb64>/<str:token>/', PasswordResetCompleteView.as_view(), name='password-reset'),
+    path('profile/', login_required(ProfileView.as_view()), name='profile'),
+    path('profile/personal-info/', ProfileChangeView.as_view(), name='personal_info'),
 ]

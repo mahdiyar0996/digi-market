@@ -32,7 +32,7 @@
         من را به خاطر بسپار
     </label>
     {% if form.errors %}
-      {% for error in form.non_field_errors %}
+      {% for error in form.errors %}
           <p class="text-danger ps-3 pt-3">{{ error }}</p>
       {% endfor %}
   {% endif %}

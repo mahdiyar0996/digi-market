@@ -112,7 +112,7 @@ STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = 'static/'
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    # "django.contrib.auth.backends.ModelBackend",
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 

@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib.auth import login
+from django.views import generic
+from django.contrib.auth import login, logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
-from .forms import RegisterForm, LoginForm, PasswordResetSendTokenForm, PasswordResetForm
+from .forms import RegisterForm, LoginForm, PasswordResetSendTokenForm, PasswordResetForm, UserForm, ProfileForm
 from .tokens import email_verification_token
 from .models import User
 from .backends import EmailUsernameAuthentication as Eua
 from django.contrib.auth.tokens import PasswordResetTokenGenerator as Prtg
 from utils.email_senders import send_token_email
+from utils.decorators import debugger
 from datetime import datetime
-
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -82,6 +84,7 @@ class LoginView(View):
             user = Eua.authenticate(request, username=username,
                                     email=email, password=password)
             user.ipaddress = request.META.get('REMOTE_ADDR')
+            user.save()
             if user is not None:
                 if remember:
                     request.session.set_expiry(0)
@@ -89,6 +92,11 @@ class LoginView(View):
                 return redirect('register')
             messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
         return render(request, 'login.html', {'form': form})
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect('home')
 
 
 class PasswordResetTokenView(View):
@@ -100,7 +108,6 @@ class PasswordResetTokenView(View):
         form = PasswordResetSendTokenForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('email')
-            print(email)
             try:
                 user = User.objects.get(email__exact=email)
                 current_site = get_current_site(request)
@@ -126,8 +133,6 @@ class PasswordResetCompleteView(View):
 
     def post(self, request, uidb64, token):
         form = PasswordResetForm(request.POST)
-        print(form)
-        print('heelll')
         if form.is_valid():
             password1 = form.cleaned_data.get('password1')
             password2 = form.cleaned_data.get('password2')
@@ -148,8 +153,38 @@ class PasswordResetCompleteView(View):
         return render(request, 'password-reset-complete.html', {'form': form})
 
 
+class ProfileView(View):
+    @debugger
+    def get(self, request):
+        user = request.user
+        profile = user.profile
+        return render(request, 'profile.html', {'user': user, 'profile': profile})
 
 
+class ProfileChangeView(View):
+    def get(self, request):
+        user = request.user
+        profile = user.profile
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm
+        return render(request, 'personal_info.html', {'user_form': user_form,
+                                                      'profile_form': profile_form,
+                                                      'user': user,
+                                                      'profile': profile})
+    def post(self, request):
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+        user_form.password = request.user.password
+        if user_form.is_valid() and profile_form.is_valid():
+            print('sdssad')
+            if user_form.password:
+                user_form.set_password(user_form.password)
+            user_form.save()
+            profile_form.save()
+            return redirect('profile')
+        print(user_form.errors, profile_form.errors)
+        return render(request, 'personal_info.html', {'user_form': user_form, "profile_form": profile_form,
+                                                      'user': request.user, 'profile': request.user.profile})
 
 
 
