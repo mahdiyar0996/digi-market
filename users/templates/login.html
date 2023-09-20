@@ -1,0 +1,51 @@
+{% extends 'index.html' %}
+{% block title %}ورود{% endblock %}
+{% block css %}
+{% load i18n %}
+{% load socialaccount %}
+{% endblock %}
+
+{% block content %}
+
+<form class="container-lg mt-5 bg-dark-subtle pt-4 " action="" method="POST" style="height: 100%;">
+    <img src="/media/site_images/logo%20image.jpg" class="float-end d-none d-lg-block" style="height: 100%; width: 430px" alt="">
+    <h2 class="text-center mb-5">ورود</h2>
+    <div class="mb-4">حسابی ندارید؟
+        <a href="{% url 'register' %}" class="text-info">ثبت نام</a>
+    </div>
+    <div class="row justify-content-start my-4" style=" margin-right: 50px; width: 200px">
+    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+    </div>
+{% csrf_token %}
+    <label for="" class="d-block mb-4">نام کاربری</label>
+    <input type="text" class="form-control" style="min-width: 200px; max-width: 400px"
+    id="username" placeholder="نام کاربری یا ایمیل خود را وارد کنید" required name="{{ form.username.name }}">
+    <label for="" class="form-text">{{ field.login.help_text }}</label>
+    <label for="" class="d-block">رمز عبور</label>
+    <input type="password" class="form-control d-inline" style="min-width: 200px; max-width: 400px"
+    id="Password" placeholder="رمز عبور خود را وارد کنید" required name="{{ form.password.name }}">
+    <input type="checkbox" class="form-check-inline mt-2 mt-sm-5 d-block d-sm-inline" onclick="show_password()" name="{{ form.remeber.name }}">نمایش رمز عبور
+    <label for="" class="form-text">{{ field.login.help_text }}</label>
+    <a href="{% url 'account-recovery' %}" class="text-decoration-none text-info d-block mb-3 mt-3 " style="width: 220px">رمز عبور خود را فراموش کردم!</a>
+    <label for="" class="mb-4 mt-4">
+        <input type="checkbox" name="{{ form.remember.name }}" class="d-inline">
+        من را به خاطر بسپار
+    </label>
+    {% if form.errors %}
+      {% for error in form.non_field_errors %}
+          <p class="text-danger ps-3 pt-3">{{ error }}</p>
+      {% endfor %}
+  {% endif %}
+     <div class="d-flex d-sm-block justify-content-center">
+    <button type="submit" class="btn btn-primary col-3 me-md-5 justify-content-sm-start d">ارسال</button>
+    </div>
+</form>
+<script>function show_password() {
+  var x = document.getElementById("Password");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}</script>
+{% endblock %}

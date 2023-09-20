@@ -1,0 +1,12 @@
+.bg-dark-subtle {
+  background-color: #656f77 !important;
+}
+
+.bg-danger {
+
+border-radius: 10px;
+background-color: rgba(244,67,54,.9);
+color: #fff !important;
+transition: .3s;
+border: 1px solid transparent;
+}

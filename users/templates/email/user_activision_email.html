@@ -1,0 +1,7 @@
+{% autoescape off %}
+سلام {{ user.username }},
+روی لینک زیر کلیک کنید تا احراز هویت شما کامل شود
+http://{{ domain }}{% url 'password-reset' uidb64=uid token=token %}
+
+    اگر شما درخواست عضویت ندادید این ایمیل را نادیده بگیرید شخص دیگری ممکن است ایمیل شما را به اشتباه وارد کرده باشد
+{% endautoescape %}
