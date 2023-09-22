@@ -13,7 +13,7 @@ from .models import User,Profile
 class ProfileAdmin(admin.StackedInline):
     model = Profile
     readonly_fields = ['updated_at']
-    fields = ['avatar', 'first_name', 'last_name', 'birthday', 'job', 'updated_at']
+    fields = ['avatar', 'first_name', 'last_name', 'age', 'job', 'updated_at']
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     fieldsets = (

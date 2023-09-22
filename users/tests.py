@@ -1,6 +1,7 @@
 from django.test import TestCase
 from .models import User
 from django.db.utils import IntegrityError
+from django.contrib.auth import login
 import django
 class Mytest(TestCase):
     def setUp(self) -> None:

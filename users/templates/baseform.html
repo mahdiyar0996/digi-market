@@ -1,0 +1,10 @@
+<div class="bg-danger">
+    <form action="">
+        {% for field in form %}
+            <label for="">
+                {{ field.label }}
+                <input type="{{ field.widget_type }}" name="{{ field.name }}">
+            </label>
+        {% endfor %}
+    </form>
+</div>

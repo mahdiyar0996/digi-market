@@ -25,3 +25,21 @@ a
 users/urls.py,7/e/7ebb6dc32a2768a7e73ce1c83409f9c85bd4ad6a
 J
 users/templates/login.html,7/9/793c96990c42260b726e24a2e7d4ca5327df621c
+>
+users/admin.py,3/e/3ea505836db8ef76dd1c89a43cfc6ee4cd79a896
+C
+utils/decorators.py,2/3/23f257cf926357952f3a8dffc2b8f48886a638bc
+L
+users/templates/profile.html,c/0/c076253c1e857db68e25e2f3ca05ad7226a36239
+>
+users/forms.py,b/a/ba33783358ae7b013e1a1c262584bd384ee7903c
+C
+utils/validators.py,d/0/d06ab817566d9a4354ade81da8c67d4648ac3e2f
+?
+users/models.py,f/1/f121007a966dcbe0e6d77b6ca09948108f3edfbb
+>
+users/views.py,5/f/5fc54a09665485d90807a8e72925d27743a0db75
+R
+"users/templates/personal_info.html,6/3/6388b6c7205bff07c770d0b3517f9401c60b4879
+A
+users/backends.py,5/e/5e581f8624c1296a48d8685cc7f33ca1d85780d4

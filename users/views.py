@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views import generic
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
-from .forms import RegisterForm, LoginForm, PasswordResetSendTokenForm, PasswordResetForm, UserForm, ProfileForm
+from .forms import RegisterForm, LoginForm, PasswordResetSendTokenForm, PasswordResetForm, UserForm
 from .tokens import email_verification_token
-from .models import User
+from .models import User, Profile
 from .backends import EmailUsernameAuthentication as Eua
 from django.contrib.auth.tokens import PasswordResetTokenGenerator as Prtg
 from utils.email_senders import send_token_email
@@ -28,11 +28,12 @@ class RegisterView(View):
     def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
+            cd = form.cleaned_data
+            user = User.objects.create_user(username=cd['username'], email=cd['email'], password=cd['password1'])
             password = form.cleaned_data['password1']
             user.set_password(password)
             user.is_active = False
-            user.save()
+            user.profile.save()
             current_site = get_current_site(request)
             send_token_email(request, user, {'subject': "دیجی مارکت",
                                              'to_email': form.cleaned_data.get('email'),
@@ -44,6 +45,7 @@ class RegisterView(View):
                                              'success_msg': 'ایمیل تایید به ایمیل شما ارسال شد',
                                              'error_msg': 'کل در ارسال ایمیل تایید دوباره امتحان کنید'
                                              })
+            messages.success(request, 'ایمیل فعال سازی به شما ارسال شد', 'success')
             return render(request, 'register.html', {'form': form})
         context = {'form': form}
         return render(request, 'register.html', context)
@@ -68,29 +70,31 @@ class UserActivationView(View):
 class LoginView(View):
     def get(self, request):
         form = LoginForm()
-        context = {'form': form}
-        return render(request, 'login.html', context={'form': form})
+        return render(request, 'login.html', {'form': form})
 
     def post(self, request):
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            remember = form.cleaned_data['remember']
-            email = None
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            remember = form.cleaned_data.get('remember')
+            print(username)
+            print(password)
+            print(username)
             if '@' in username:
-                email = username
-                username = None
-            user = Eua.authenticate(request, username=username,
-                                    email=email, password=password)
-            user.ipaddress = request.META.get('REMOTE_ADDR')
-            user.save()
+
+                user = authenticate(request, email=username, password=password)
+            else:
+                user = authenticate(request, username=username, password=password)
             if user is not None:
+                user.ipaddress = request.META.get('REMOTE_ADDR')
+                user.save()
                 if remember:
                     request.session.set_expiry(0)
                 login(request, user)
-                return redirect('register')
+                return redirect('profile')
             messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
+        print(form.errors)
         return render(request, 'login.html', {'form': form})
 
 class Logout(View):
@@ -164,27 +168,22 @@ class ProfileView(View):
 class ProfileChangeView(View):
     def get(self, request):
         user = request.user
-        profile = user.profile
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm
-        return render(request, 'personal_info.html', {'user_form': user_form,
-                                                      'profile_form': profile_form,
-                                                      'user': user,
-                                                      'profile': profile})
+        user_data: dict = user.to_dict()
+        user_data.update(user.profile.to_dict())
+        form = UserForm(initial=user_data)
+        return render(request, 'personal_info.html', {'form': form,
+                                                      'user': user})
     def post(self, request):
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, instance=request.user.profile)
-        user_form.password = request.user.password
-        if user_form.is_valid() and profile_form.is_valid():
-            print('sdssad')
-            if user_form.password:
-                user_form.set_password(user_form.password)
-            user_form.save()
-            profile_form.save()
+        user = request.user
+        form = UserForm(request.POST, initial=request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user.save(**cd)
+            user.profile.save(**cd)
             return redirect('profile')
-        print(user_form.errors, profile_form.errors)
-        return render(request, 'personal_info.html', {'user_form': user_form, "profile_form": profile_form,
-                                                      'user': request.user, 'profile': request.user.profile})
+
+        return render(request, 'personal_info.html', {'form': form, 'user': request.user,
+                                                      'profile': request.user.profile})
 
 
 

@@ -31,11 +31,16 @@
         <input type="checkbox" name="{{ form.remember.name }}" class="d-inline">
         من را به خاطر بسپار
     </label>
-    {% if form.errors %}
-      {% for error in form.errors %}
-          <p class="text-danger ps-3 pt-3">{{ error }}</p>
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+          <p class="text-danger ps-3 pt-3">{{ error|striptags }}</p>
       {% endfor %}
   {% endif %}
+    {% if messages %}
+          {% for msg in messages %}
+              <p class="text-danger ps-3 pt-3">{{ msg }}</p>
+          {% endfor %}
+    {% endif %}
      <div class="d-flex d-sm-block justify-content-center">
     <button type="submit" class="btn btn-primary col-3 me-md-5 justify-content-sm-start d">ارسال</button>
     </div>

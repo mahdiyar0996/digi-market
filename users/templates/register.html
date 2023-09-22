@@ -15,10 +15,13 @@
 {% csrf_token %}
     {% if form.errors %}
       {% for error in form.non_field_errors %}
-          <p class="text-danger ps-3 pt-3">{{ error }}</p>
+          <p class="text-danger ps-3 pt-3">{{ error|striptags }}</p>
       {% endfor %}
-{#        {% else %}#}
-{#        <p class="text-danger ps-3 pt-3" style="height: 40px">{{ message }}</p>#}
+  {% endif %}
+    {% if messages %}
+      {% for msg in messages %}
+          <p class="text-{{ msg.tags }} ps-3 pt-3">{{ msg }}</p>
+      {% endfor %}
   {% endif %}
     {% if form.errors %}
         <p class="text-danger">{{ form.username.errors|striptags }}</p>

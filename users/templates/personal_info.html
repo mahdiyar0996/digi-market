@@ -8,13 +8,13 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row flex-row flex-nowrap">
-        <div class="card col-3 mt-5" style="min-width: 250px;max-width: 300px; height: 100vh;">
-            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url|urlize }}" class="w-50 h-100 border rounded-circle" alt="">
+        <div class="card col-3 mt-5" style="min-width: 250px;max-width: 300px; height: 100%;">
+            <div class="card-title w-100 text-center mt-5"><img src="{{ user.profile.avatar.url|urlize }}" class="w-50 h-100 border rounded-circle" alt="">
                 <a href="" class="text-decoration-none">{{ user.username }}</a>
             </div>
             <hr>
             <div class="card-body">
-                <a href="" class="d-flex justify-content-between align-items-center text-decoration-none">موجودی {{ user.credits }}
+                <a href="" class="d-flex justify-content-between align-items-center text-decoration-none">موجودی {% if user.credits == None %}0{% else %}{{ user.credits }}{% endif %}
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-back-fill" viewBox="0 0 16 16">
                          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5H0V4zm11.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2zM0 11v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1H0z"/>
                     </svg>
@@ -56,7 +56,7 @@
                     </svg>
                 </a>
                 <hr>
-                <a href="" class="d-flex align-items-center justify-content-between text-decoration-none">خروج
+                <a href="{% url 'logout' %}" class="d-flex align-items-center justify-content-between text-decoration-none">خروج
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
                       <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
@@ -68,31 +68,24 @@
             <div class="card-body">
                 <form action="" method="POST" class="row">
                     {% csrf_token %}
-                    {% for form in user_form %}
+                    {% for field in form %}
+                        {% if form.first_name.name == field.name %}
+                            <div class="d-flex justify-content-center">
+                                <input type="submit" value="ارسال" style="width: 100px" class="mb-3 border-1 rounded">
+                            </div>
+                            <hr>
+                            <h2 class="text-center">اطلاعات شخصی</h2>
+                        {% endif %}
                         <div class="col-6 my-5 d-inline" >
-                        {% if form.errors %}
-                            <p class=" d-block">{{ form.errors|striptags }}</p>
+                        {% if field.errors %}
+                            <p class=" d-block">{{ field.errors|striptags }}</p>
                         {% endif %}
                         <label for="" style="width: 117px" class="text-center">
-                            {{ form.label }}
+                            {{ field.label }}
                         </label>
-                        <input type="{{ form.widget_type }}" class="border rounded form-control" placeholder="{{ form.help_text }}" {% if form.name != 'password' %}value="{{ form.value }}"{% else %}disabled{% endif %}>
-                        </div>
-                    {% endfor %}
-                    <div class="d-flex justify-content-center">
-                        <input type="submit" value="ارسال" style="width: 100px" class="mb-3 rounded border-1">
-                    </div>
-                    <hr>
-                    <h2 class="text-center">اطلاعات شخصی</h2>
-                    {% for form in profile_form %}
-                        <div class="col-6 my-5 d-inline">
-                        {% if form.errors %}
-                            <p for="" class="placeholder d-block">{{ form.errros|striptags }}</p>
-                        {% endif %}
-                        <label for="" style="width: 117px" class="text-center">
-                            {{ form.label }}
-                        </label>
-                        <input type="{{ form.widget_type }}" class="rounded border form-control" placeholder="{{ form.help_text }}">
+                        <input type="{{ field.widget_type }}" class="border rounded form-control"
+                               placeholder="{{ field.help_text }}" {% if field.name != 'password' %}
+                               value="{{ field.value }}"{% else %}disabled{% endif %} name="{{ field.name }}">
                         </div>
                     {% endfor %}
                      <div class="d-flex justify-content-center">
