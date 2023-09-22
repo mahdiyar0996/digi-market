@@ -120,7 +120,7 @@ class UserForm(forms.Form):
     address = forms.CharField(label='ادرس', max_length=255, required=False)
     first_name = forms.CharField(label='نام', max_length=55, required=False)
     last_name = forms.CharField(label='نام خانوادگی', max_length=55, required=False)
-    birthday = forms.IntegerField(label='تاریخ تولد', required=False, widget=forms.NumberInput)
+    age = forms.CharField(label='تاریخ تولد', max_length=3, required=False, widget=forms.NumberInput)
     job = forms.CharField(label='شغل', max_length=55, required=False)
 
     # class Meta:

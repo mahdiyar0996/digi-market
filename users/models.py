@@ -95,20 +95,6 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         self.city = kwargs.get('city', self.city)
         self.address = kwargs.get('address', self.address)
         super().save()
-    # def save(self, *args, **kwargs):
-    #     model_fields = self.get_model_fields()
-    #     print(kwargs)
-    #     for field in model_fields:
-    #         try:
-    #             data_field = field.split('.')[-1]
-    #         except:
-    #             continue
-    #         if data_field != kwargs[str(data_field)]:
-    #             data_field = kwargs[data_field]
-    #             if data_field == kwargs['password']:
-    #                 data_field = self.set_password(kwargs['password'])
-    #     super(User, self).save()
-
 
 class Profile(models.Model):
     key = models.OneToOneField(User, related_name='%(class)s', blank=True, null=True, on_delete=models.CASCADE)
@@ -135,30 +121,8 @@ class Profile(models.Model):
         return self._meta.get_fields()
     
     def save(self, *args, **kwargs):
-        if kwargs.get('first_name'):
-            self.first_name = kwargs.get('first_name')
-        if kwargs.get('last_name'):
-            self.last_name = kwargs.get('last_name')
-        if kwargs.get('age'):
-            self.age = kwargs.get('age')
-        if kwargs.get('job'):
-            self.job = kwargs.get('job')
+        self.first_name = kwargs.get('first_name', self.first_name)
+        self.last_name = kwargs.get('last_name', self.last_name)
+        self.age = kwargs.get('age', self.age)
+        self.job = kwargs.get('job', self.job)
         super().save()
-    # def save(self, *args, **kwargs):
-    #     self.first_name = kwargs.get('first_name')
-    #     self.last_name = kwargs.get('last_name')
-    #     self.age = kwargs.get('age')
-    #     self.job = kwargs.get('job')
-    #     super(Profile, self).save(*args, **kwargs)
-
-    # def save(self, *args, **kwargs):
-    #     model_fields = self.get_model_fields()
-    #     print(kwargs)
-    #     for field in model_fields:
-    #         try:
-    #             data_field = field.split('.')[-1]
-    #         except:
-    #             continue
-    #         if data_field != kwargs[str(data_field)]:
-    #             data_field = kwargs[data_field]
-    #     super(Profile, self).save()
