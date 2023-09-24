@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
                                     error_messages={'unique': 'این شماره قبلا انتخاب شده است',
                                                     'invalid': 'شماره وارد شده نا معتبر است'})
     credits = models.BigIntegerField('موجودی', null=True, blank=True)
-    password = models.CharField('رمز عبور',max_length=255, validators=[valid_password()],
+    password = models.CharField('رمز عبور',max_length=255,
                                 error_messages={'invalid': 'رمز کاربری باید ۸ کاراکتر یا بیشتر باشد و یک حرف بزرگ داشته باشد'})
     city = models.CharField('شهر',max_length=55, blank=True, null=True, db_index=True)
     address = models.TextField('ادرس', max_length=555, blank=True, null=True)
@@ -98,7 +98,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         super().save()
 
 class Profile(models.Model):
-    key = models.OneToOneField(User, related_name='%(class)s', blank=True, null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='%(class)s', blank=True, null=True, on_delete=models.CASCADE)
     avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='media/users/profile/',
                                default='media/users/profile/default.jpg')
     first_name = models.CharField('نام', max_length=55, null=True, blank=True)
@@ -113,7 +113,7 @@ class Profile(models.Model):
 
 
     def __str__(self):
-        return self.key.username
+        return self.user.username
 
     def to_dict(self):
         return model_to_dict(self)

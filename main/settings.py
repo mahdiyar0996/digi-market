@@ -116,8 +116,8 @@ STATIC_URL = 'static/'
 LOGIN_URL = 'login'
 
 AUTHENTICATION_BACKENDS = [
-    # "django.contrib.auth.backends.ModelBackend",
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 
@@ -144,16 +144,22 @@ DATABASES = {       #DJANGO TARIF DATABASE
 #caching
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        },
-        "KEY_PREFIX": "example"
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,  # seconds  connection timeout
+            "SOCKET_TIMEOUT": 5,  # seconds  #read and write timeout
+            "IGNORE_EXCEPTIONS": True,     #when redis is down dont raise exception
+
+        }
     }
 }
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True    #when redis is down dont raise exception     for all redis servers
+# DJANGO_REDIS_LOGGER = 'some.specified.logger'
 
-
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

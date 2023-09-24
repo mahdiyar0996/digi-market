@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views import generic
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -14,9 +13,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator as Prtg
 from utils.email_senders import send_token_email
 from utils.decorators import debugger
 from datetime import datetime
-from django.contrib.auth.decorators import login_required
-from django.http.response import HttpResponseBadRequest
-
+from django.core.cache import cache
 
 class RegisterView(View):
     def get(self, request):
@@ -71,6 +68,7 @@ class RegisterCompleteView(View):
 class LoginView(View):
     def get(self, request):
         form = LoginForm()
+
         return render(request, 'login.html', {'form': form})
 
     def post(self, request):
@@ -83,15 +81,20 @@ class LoginView(View):
                 user = Eua.authenticate(request, email=username, password=password)
             else:
                 user = Eua.authenticate(request, username=username, password=password)
+                print(user)
             if user is not None:
                 user.ipaddress = request.META.get('REMOTE_ADDR')
                 user.save()
+                # cache.set('user', user)
+                print(cache.set(request.COOKIES.get('sessionid'), user))
                 if remember:
                     request.session.set_expiry(0)
                 login(request, user)
                 return redirect('profile')
-            messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
-        print(form.errors)
+
+            return render(request, 'login.html', {'form': form}, status=400)
+
+        messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
         return render(request, 'login.html', {'form': form}, status=400)
 
 class Logout(View):
@@ -157,22 +160,28 @@ class PasswordResetCompleteView(View):
 class ProfileView(View):
     @debugger
     def get(self, request):
-        user = request.user
+        user = cache.get(request.COOKIES.get('sessionid'))
+        if not user:
+            user = request.user
+            cache.set(request.COOKIES.get('sessionid'), user)
         if hasattr(user, 'profile'):
             profile = user.profile
         else:
-            profile = Profile.objects.create(key=user, first_name=user.first_name)
+            profile = Profile.objects.create(user=user, first_name=user.first_name)
         return render(request, 'profile.html', {'user': user, 'profile': profile})
 
 
 class ProfileChangeView(View):
+    @debugger
     def get(self, request):
-        user = request.user
-        user_data: dict = user.to_dict()
-        user_data.update(user.profile.to_dict())
+        # user = cache.get(request.COOKIES.get('sessionid'))
+        # if not user:
+        profile = Profile.objects.select_related('user').get(user=request.user)
+        user_data: dict = profile.to_dict()
+        user_data.update(profile.user.to_dict())
         form = UserForm(initial=user_data)
         return render(request, 'personal_info.html', {'form': form,
-                                                      'user': user})
+                                                      'profile': profile})
     def post(self, request):
         user = request.user
         form = UserForm(request.POST, initial=request.POST)
