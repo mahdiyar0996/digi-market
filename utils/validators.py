@@ -3,14 +3,15 @@ from django.core.validators import ValidationError, RegexValidator, MinLengthVal
 
 def valid_email():
     validator = RegexValidator('^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$',
-                   message='ایمیل وارد شده معتبر نمی باشد',
-                   code='invalid')
+                               message='ایمیل وارد شده معتبر نمی باشد',
+                               code='invalid')
     return validator
 
 
 def valid_username():
     validator = RegexValidator('([a-zA-Z0-9_]+)',
                    message='نام کاربری نباید از حروف !٬#$%^&*()باشد', code='invalid')
+
     return validator
 
 
@@ -21,8 +22,8 @@ def valid_phone_number():
 
 
 def valid_password():
-    validator = RegexValidator('([\w\d\b]{8,})', code='invalid',
-                   message='رمز عبور حداقل باید ۸ کاراکتر یا بیشتر باشد و حداقل یک حرف بزرگ داشته باشد')
+    validator = RegexValidator("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$", code='valid',
+                   message='رمز عبور حداقل باید ۸ کاراکتر یا بیشتر باشد و حداقل یک حرف بزرگ و یک عدد داشته باشد')
     return validator
 
 

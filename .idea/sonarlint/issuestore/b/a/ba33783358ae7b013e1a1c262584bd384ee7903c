@@ -1,6 +1,6 @@
 
-Bpython:S125"Remove this commented out code.(ê®”Ôùÿÿÿÿ8×É†ç«1
-fpython:S6353\"BUse concise character class syntax '\w' instead of '[a-zA-Z0-9_]'.(«’Èøüÿÿÿÿ8ØÉ†ç«1
-=python:S125~"Remove this commented out code.(Å›––8ÙÉ†ç«1
-Cpython:S125‚"Remove this commented out code.(³•‚¢øÿÿÿÿ8ÚÉ†ç«1
->python:S125Š"Remove this commented out code.(ÆÔœ¦8ÛÉ†ç«1
+Bpython:S125"Remove this commented out code.(ê®”Ôùÿÿÿÿ8ñ„¹¬1
+fpython:S6353E"BUse concise character class syntax '\w' instead of '[a-zA-Z0-9_]'.(«’Èøüÿÿÿÿ8ñ„¹¬1
+=python:S125g"Remove this commented out code.(Å›––8‘ñ„¹¬1
+Bpython:S125k"Remove this commented out code.(³•‚¢øÿÿÿÿ8’ñ„¹¬1
+=python:S125s"Remove this commented out code.(ÆÔœ¦8“ñ„¹¬1

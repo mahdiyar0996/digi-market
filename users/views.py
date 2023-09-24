@@ -15,25 +15,27 @@ from utils.email_senders import send_token_email
 from utils.decorators import debugger
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
-
-
+from django.http.response import HttpResponseBadRequest
 
 
 class RegisterView(View):
     def get(self, request):
         form = RegisterForm()
         context = {'form': form}
+        print(form.initial)
         return render(request, 'register.html', context)
 
     def post(self, request):
-        form = RegisterForm(request.POST)
+        initial_dict = {
+            "username": request.POST.get('username'),
+            "email": request.POST.get('email'),
+        }
+        form = RegisterForm(request.POST, initial=request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            user = User.objects.create_user(username=cd['username'], email=cd['email'], password=cd['password1'])
-            password = form.cleaned_data['password1']
-            user.set_password(password)
-            user.is_active = False
-            user.profile.save()
+            user = User.objects.create_user(username=cd['username'],
+                                            email=cd['email'], password=cd['password1'],
+                                            is_active=False)
             current_site = get_current_site(request)
             send_token_email(request, user, {'subject': "دیجی مارکت",
                                              'to_email': form.cleaned_data.get('email'),
@@ -43,15 +45,14 @@ class RegisterView(View):
                                              'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                                              'token': email_verification_token.make_token(user),
                                              'success_msg': 'ایمیل تایید به ایمیل شما ارسال شد',
-                                             'error_msg': 'کل در ارسال ایمیل تایید دوباره امتحان کنید'
+                                             'error_msg': 'مشکل در ارسال ایمیل تایید دوباره امتحان کنید'
                                              })
-            messages.success(request, 'ایمیل فعال سازی به شما ارسال شد', 'success')
             return render(request, 'register.html', {'form': form})
         context = {'form': form}
-        return render(request, 'register.html', context)
+        return render(request, 'register.html', context, status=400)
 
 
-class UserActivationView(View):
+class RegisterCompleteView(View):
     def get(self, request, uidb64, token):
         try:
             uid = urlsafe_base64_decode(uidb64)
@@ -73,19 +74,15 @@ class LoginView(View):
         return render(request, 'login.html', {'form': form})
 
     def post(self, request):
-        form = LoginForm(request.POST)
+        form = LoginForm(request.POST, initial=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             remember = form.cleaned_data.get('remember')
-            print(username)
-            print(password)
-            print(username)
             if '@' in username:
-
-                user = authenticate(request, email=username, password=password)
+                user = Eua.authenticate(request, email=username, password=password)
             else:
-                user = authenticate(request, username=username, password=password)
+                user = Eua.authenticate(request, username=username, password=password)
             if user is not None:
                 user.ipaddress = request.META.get('REMOTE_ADDR')
                 user.save()
@@ -95,7 +92,7 @@ class LoginView(View):
                 return redirect('profile')
             messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
         print(form.errors)
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'login.html', {'form': form}, status=400)
 
 class Logout(View):
     def get(self, request):
@@ -161,7 +158,10 @@ class ProfileView(View):
     @debugger
     def get(self, request):
         user = request.user
-        profile = user.profile
+        if hasattr(user, 'profile'):
+            profile = user.profile
+        else:
+            profile = Profile.objects.create(key=user, first_name=user.first_name)
         return render(request, 'profile.html', {'user': user, 'profile': profile})
 
 

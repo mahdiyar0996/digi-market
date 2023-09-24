@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import login_required
 from .views import (RegisterView,
-                    UserActivationView,
+                    RegisterCompleteView,
                     LoginView,
                     Logout,
                     PasswordResetTokenView,
@@ -11,7 +11,7 @@ from .views import (RegisterView,
                     ProfileChangeView)
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
-    path('activate/<str:uidb64>/<str:token>/', UserActivationView.as_view(), name='email-activate'),
+    path('activate/<str:uidb64>/<str:token>/', RegisterCompleteView.as_view(), name='email-activate'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
     path('users/account-recovery/', PasswordResetTokenView.as_view(), name='account-recovery'),

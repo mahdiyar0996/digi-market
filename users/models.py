@@ -24,6 +24,9 @@ class UserManager(BaseUserManager):
 
         email = self.normalize_email(email)
         user = self.model(username=username, email=email, **kwargs)
+        user.is_superuser = is_superuser
+        user.is_staff = is_staff
+        user.is_active = is_active
         user.set_password(password)
         user.save()
         Profile.objects.create(key=user, first_name=username)
@@ -32,12 +35,10 @@ class UserManager(BaseUserManager):
                     is_superuser=False, is_staff=False, is_active=True, **kwargs):
         return self._create_user(username, email, password, is_superuser=is_superuser,
                                  is_staff=is_staff, is_active=is_active, **kwargs)
-
     def create_superuser(self, username, email, password,
                          is_superuser=True, is_staff=True, is_active=True, **kwargs):
         return self._create_user(username, email, password, is_superuser=is_superuser,
                                  is_staff=is_staff, is_active=is_active, **kwargs)
-
 
 
 
@@ -91,7 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
     def save(self, *args, **kwargs):
         self.username = kwargs.get('username', self.username)
         self.email = kwargs.get('email', self.email)
-        self.phone_number = kwargs.get('phone_number', self.email)
+        self.phone_number = kwargs.get('phone_number', self.phone_number)
         self.city = kwargs.get('city', self.city)
         self.address = kwargs.get('address', self.address)
         super().save()

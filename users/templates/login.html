@@ -18,7 +18,7 @@
     </div>
 {% csrf_token %}
     <label for="" class="d-block mb-4">نام کاربری</label>
-    <input type="text" class="form-control" style="min-width: 200px; max-width: 400px"
+    <input type="text"value="{% if form.username %}{{ form.username.value }}{% endif %}" class="form-control" style="min-width: 200px; max-width: 400px"
     id="username" placeholder="نام کاربری یا ایمیل خود را وارد کنید" required name="{{ form.username.name }}">
     <label for="" class="form-text">{{ field.login.help_text }}</label>
     <label for="" class="d-block">رمز عبور</label>

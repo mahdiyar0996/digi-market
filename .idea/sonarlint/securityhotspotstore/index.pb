@@ -43,3 +43,5 @@ R
 "users/templates/personal_info.html,6/3/6388b6c7205bff07c770d0b3517f9401c60b4879
 A
 users/backends.py,5/e/5e581f8624c1296a48d8685cc7f33ca1d85780d4
+F
+utils/email_senders.py,c/4/c49dcefe3c48927ffec93470c6d18090cd6ff3ec
