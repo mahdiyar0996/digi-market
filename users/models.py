@@ -98,9 +98,9 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         super().save()
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, related_name='%(class)s', blank=True, null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, primary_key=True, related_name='%(class)s', blank=True, on_delete=models.CASCADE)
     avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='media/users/profile/',
-                               default='media/users/profile/default.jpg')
+                               default='users/profile/default.jpg')
     first_name = models.CharField('نام', max_length=55, null=True, blank=True)
     last_name = models.CharField('نام خانوادگی', max_length=55, blank=True, null=True)
     age = models.SmallIntegerField('تاریخ تولد', blank=True, null=True)

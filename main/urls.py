@@ -24,5 +24,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),  #oauth urls
     path('captcha/', include('captcha.urls')),   #captcha urls
     path('', include('users.urls')),
+    path('', include('core.urls'))
 ]
 urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

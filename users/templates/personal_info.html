@@ -9,12 +9,13 @@
 <div class="container-fluid">
     <div class="row flex-row flex-nowrap justify-content-center justify-content-md-start">
         <div class="card col-3 mt-5 d-none d-md-block" style="min-width: 250px;max-width: 300px; height: 100%;">
-            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url|urlize }}" class="w-50 h-100 border rounded-circle" alt="">
-                <a href="" class="text-decoration-none">{{ profile.user.username }}</a>
+            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url|urlize }}"
+                                                                class="w-50 h-100 border rounded-circle" alt="">
+                <a href="" class="text-decoration-none">{{ user.username }}</a>
             </div>
             <hr>
             <div class="card-body">
-                <a href="" class="d-flex justify-content-between align-items-center text-decoration-none">موجودی {% if profile.user.credits == None %}0{% else %}{{ profile.user.credits }}{% endif %}
+                <a href="" class="d-flex justify-content-between align-items-center text-decoration-none">موجودی {% if user.credits == None %}0{% else %}{{ user.credits }}{% endif %}
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-back-fill" viewBox="0 0 16 16">
                          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5H0V4zm11.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2zM0 11v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1H0z"/>
                     </svg>
@@ -66,7 +67,7 @@
         </div>
         <div class="card col-8 m-sm-5">
             <div class="card-body">
-                <form action="" method="POST" class="row">
+                <form action="" method="POST" class="row px-1 px-sm-3">
                     {% csrf_token %}
                     <h2 class="text-center">اطلاعات کاربری</h2>
                     {% for field in form %}
@@ -77,7 +78,7 @@
                             <hr>
                             <h2 class="text-center">اطلاعات شخصی</h2>
                         {% endif %}
-                        <div class="col-6 my-5 d-inline" >
+                        <div class="col-6 my-5 d-inline px-1 px-sm-1" >
                         {% if field.errors %}
                             <p class=" d-block">{{ field.errors|striptags }}</p>
                         {% endif %}

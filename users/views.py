@@ -177,11 +177,13 @@ class ProfileChangeView(View):
         # user = cache.get(request.COOKIES.get('sessionid'))
         # if not user:
         profile = Profile.objects.select_related('user').get(user=request.user)
+        user = request.user
         user_data: dict = profile.to_dict()
         user_data.update(profile.user.to_dict())
         form = UserForm(initial=user_data)
         return render(request, 'personal_info.html', {'form': form,
-                                                      'profile': profile})
+                                                      'profile': profile,
+                                                      'user': user})
     def post(self, request):
         user = request.user
         form = UserForm(request.POST, initial=request.POST)
@@ -191,8 +193,8 @@ class ProfileChangeView(View):
             user.profile.save(**cd)
             return redirect('profile')
 
-        return render(request, 'personal_info.html', {'form': form, 'user': request.user,
-                                                      'profile': request.user.profile})
+        return render(request, 'personal_info.html', {'form': form, 'user': user,
+                                                      'profile': user.profile})
 
 
 
