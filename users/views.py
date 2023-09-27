@@ -19,7 +19,6 @@ class RegisterView(View):
     def get(self, request):
         form = RegisterForm()
         context = {'form': form}
-        print(form.initial)
         return render(request, 'register.html', context)
 
     def post(self, request):
@@ -81,12 +80,9 @@ class LoginView(View):
                 user = Eua.authenticate(request, email=username, password=password)
             else:
                 user = Eua.authenticate(request, username=username, password=password)
-                print(user)
             if user is not None:
                 user.ipaddress = request.META.get('REMOTE_ADDR')
                 user.save()
-                # cache.set('user', user)
-                print(cache.set(request.COOKIES.get('sessionid'), user))
                 if remember:
                     request.session.set_expiry(0)
                 login(request, user)

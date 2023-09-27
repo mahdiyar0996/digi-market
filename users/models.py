@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
         user.is_active = is_active
         user.set_password(password)
         user.save()
-        Profile.objects.create(key=user, first_name=username)
+        Profile.objects.create(user=user, first_name=username)
         return user
     def create_user(self, username, email, password,
                     is_superuser=False, is_staff=False, is_active=True, **kwargs):
