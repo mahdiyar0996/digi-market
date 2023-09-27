@@ -13,10 +13,25 @@ class Category(BaseAbstract):
     avatar = models.ImageField("آواتار", upload_to='products/category/avatar/')
     pass
 
+    def __str__(self):
+        return self.name
+    class Meta:
+        db_table = "categories"
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
+
 
 class SubCategory(BaseAbstract):
     category = models.ForeignKey(Category, related_name='%(class)s', on_delete=models.DO_NOTHING)
     avatar = models.ImageField("آواتار", upload_to='products/subcategory/avatar/')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = "sub_categories"
+        verbose_name = 'sub_category'
+        verbose_name_plural = 'sub_categories'
 
 
 class Product(BaseAbstract):
@@ -31,13 +46,15 @@ class Product(BaseAbstract):
     stock = models.BigIntegerField("تعداد کالا", blank=True, null=True)
     avatar = models.ImageField('آواتار', blank=True, null=True, upload_to='products/avatar/')
 
+
     class Meta:
         db_table = 'products'
         verbose_name = 'product'
         verbose_name_plural = 'products'
         ordering = ['created_at', 'stock', 'price']
 
-
+    def __str__(self):
+        return self.name
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
     images = models.ImageField('عکس ها', upload_to='products/images/', blank=True)
@@ -46,7 +63,8 @@ class ProductImage(models.Model):
         db_table = 'product-images'
         verbose_name = 'product-image'
         verbose_name_plural = 'products-images'
-
+    def __str__(self):
+        return self.product.name
 
 class ProductComment(BaseAbstract):
     product = models.ForeignKey(Product, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
@@ -61,3 +79,6 @@ class ProductComment(BaseAbstract):
         verbose_name = 'product-comment'
         verbose_name_plural = 'products-comments'
         ordering = ['rating', 'updated_at', 'created_at']
+
+    def __str__(self):
+        return self.user.username

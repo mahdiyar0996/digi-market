@@ -12,7 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('زیر مجموعه', {'fields': ('name', 'avatar')}),
+        ('زیر مجموعه', {'fields': ('category', 'name', 'avatar')}),
     )
     list_display = ['id', 'name', 'created_at', 'updated_at']
 

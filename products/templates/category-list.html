@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+{% block title %}
+
+{% endblock %}
+{% load static %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<header>
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+      {% for image in header %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      <img src="{{image.image.url}}" class="d-block img-fluid" alt="..." >
+    </div>
+      {% endfor %}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+</header>
+
+
+<div class="card border rounded-4 mx-3 mt-4">
+    <h2 class="text-center mt-4">خرید بر اساس دسته‌بندی</h2>
+    <div class="row flex-row mt-4">
+        {% for field in subcategory %}
+        <a class="col-4 col-sm-2 text-center text-decoration-none">
+        <img src="{{ field.avatar.url }}" alt="" width="120" height="120">
+        <p>{{ field.name }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

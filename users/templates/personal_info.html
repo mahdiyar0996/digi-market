@@ -9,9 +9,9 @@
 <div class="container-fluid">
     <div class="row flex-row flex-nowrap justify-content-center justify-content-md-start">
         <div class="card col-3 mt-5 d-none d-md-block" style="min-width: 250px;max-width: 300px; height: 100%;">
-            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url|urlize }}"
+            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url}}"
                                                                 class="w-50 h-100 border rounded-circle" alt="">
-                <a href="" class="text-decoration-none">{{ user.username }}</a>
+                <a href="{% url 'personal_info' %}" class="text-decoration-none">{{ user.username }}</a>
             </div>
             <hr>
             <div class="card-body">
@@ -65,7 +65,7 @@
                 </a>
             </div>
         </div>
-        <div class="card col-8 m-sm-5">
+        <div class="card col-8 m-5">
             <div class="card-body">
                 <form action="" method="POST" class="row px-1 px-sm-3">
                     {% csrf_token %}
