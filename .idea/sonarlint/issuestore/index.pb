@@ -61,3 +61,13 @@ J
 core/views.py,4/7/4706701c005a11d84d8ae7731365c7c336e3f466
 A
 utils/scraping.py,7/1/7178ac091e39ca66fd2c42acbbe8b1c1295fc579
+A
+products/admin.py,1/e/1ea3f0cae641cc6a7921f2ebb3dd67fca093dc01
+B
+products/models.py,5/b/5b4db18331b8f185b9797bbf6cdc7c6da8f6e904
+@
+products/urls.py,c/3/c3cf7c6b7cba09d947e60eed5c7b4eb3b2f3ccdf
+U
+%products/templates/category-list.html,8/4/84c53624ddf6c6b0f48a993f55bf82415188bad6
+A
+products/views.py,e/7/e7c0df80dbe407ceab2293cb3ce846b3cc0b1733

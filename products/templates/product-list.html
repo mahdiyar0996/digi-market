@@ -1,0 +1,31 @@
+{% extends 'index.html' %}
+{% block title %}
+{% endblock %}
+{% block css %}
+
+{% endblock %}
+{% block content %}
+<div class="row">
+<div class="card col-3 flex-row">
+    sd
+</div>
+    <div class="col-9 d-flex flex-row" style="height: 100vh; justify-self: end">
+        <div class="row">
+
+        {% for field in products %}
+         <a href="{% url 'product-details' field.category.name field.name %}" class="col-6 col-md-4 d-flex flex-column justify-content-center align-items-center p-3 col-sm-2 text-center text-decoration-none border" style="width: 337px; height: 400px">
+            <img src="{{ field.avatar.url }}" alt="" width="240" height="240">
+            <p class="d-block">{{ field.name }}</p>
+            <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                <p class="d-block {% if field.stock < 10 %}text-danger{% endif %}" style="justify-self: start">تعداد در انبار{{ field.stock }}</p>
+                <p class="d-block" style="justify-self: end">32</p>
+            </div>
+            <p class="text-end">تومان {{ field.price }}</p>
+        </a>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

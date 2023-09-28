@@ -1,0 +1,45 @@
+{% extends 'index.html' %}
+{% block title %}
+{% endblock %}
+{% load static %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<div class="row flex-row flex-md-row mx-2">
+<p class="text-muted">{{ product.category.category.name }} / {{ product.category.name }} / {{ product.tag }}</p>
+    <div class="col-4" id="product-image" style="height: 500px">
+        <div id="carouselExampleAutoplaying" style="height: 100%" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner h-100">
+              {% for image in product_images %}
+            <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %} h-100">
+              <img src="{{image.images.url}}" class="d-block img-fluid"  alt="..." >
+            </div>
+              {% endfor %}
+            </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-8" id="product-details">
+        <h5 class="">{{ product.name }}</h5>
+        <hr>
+        <ul>
+            <h5 class="mb-5" style="font-family: KacstPen">
+                ویژه گی ها
+            </h5>
+            {% for key,value in product_details %}
+                <div class="d-flex flex-row">
+            <p class="me-4">{{ key }}:</p>
+                <p>{{ value }}</p>
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

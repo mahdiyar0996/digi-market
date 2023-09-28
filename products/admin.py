@@ -16,14 +16,28 @@ class SubCategoryAdmin(admin.ModelAdmin):
     )
     list_display = ['id', 'name', 'created_at', 'updated_at']
 
+
+class ProductImageAdmin(admin.StackedInline):
+    model = ProductImage
+    fields = ['images', ]
+    extra = 0
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('مشخصات محصول', {'fields': ('name', 'description', 'details', 'warranty', 'tag')}),
+        ('مشخصات محصول', {'fields': ('category', 'name', 'description', 'details', 'warranty', 'tag')}),
         ('قیمت محصول', {'fields': ('price', 'discount')}),
         (None, {'fields': ('colour', 'stock', 'avatar')}),
-        ('دسترسی ها', {'fields': ('is_acitve', )}),
+        ('دسترسی ها', {'fields': ('is_active', )}),
         (None, {'fields': ('created_at', 'updated_at')}),
     )
     readonly_fields = ['created_at', 'updated_at']
     list_display = ['id', 'name', 'price', 'discount', 'tag', 'stock', 'is_active', 'created_at', 'updated_at']
+    inlines = [ProductImageAdmin,]
+
+@admin.register(ProductComment)
+class ProductCommentAdmin(admin.ModelAdmin):
+    readonly_fields = ['created_at', 'updated_at']
+    fields = ['product', 'user', 'rating', 'comment', 'is_active', 'created_at', 'updated_at']
+    list_display = ['product', 'user', 'is_active', 'created_at', 'updated_at']

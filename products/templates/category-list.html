@@ -31,7 +31,7 @@
     <h2 class="text-center mt-4">خرید بر اساس دسته‌بندی</h2>
     <div class="row flex-row mt-4">
         {% for field in subcategory %}
-        <a class="col-4 col-sm-2 text-center text-decoration-none">
+        <a href="{% url 'product-list' field.name %}" class="col-4 col-sm-2 text-center text-decoration-none">
         <img src="{{ field.avatar.url }}" alt="" width="120" height="120">
         <p>{{ field.name }}</p>
         </a>
