@@ -70,10 +70,18 @@ class ProductImage(models.Model):
         return self.product.name
 
 class ProductComment(BaseAbstract):
+    choices = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+    ]
+
     product = models.ForeignKey(Product,verbose_name='کالا', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
     user = models.ForeignKey('users.User', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
-    rating = models.IntegerField("امتیاز", blank=True, null=True, default=10, db_index=True)
-    comment = models.TextField('دیدگاه')
+    rating = models.SmallIntegerField("امتیاز", blank=True, null=True, choices=choices, db_index=True)
+    comment = models.TextField('دیدگاه', default=5)
     is_active = models.BooleanField('وضعیت', default=False, db_index=True)
     name = None
 

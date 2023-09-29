@@ -13,7 +13,7 @@
         <div class="row">
 
         {% for field in products %}
-         <a href="{% url 'product-details' field.category.name field.name %}" class="col-6 col-md-4 d-flex flex-column justify-content-center align-items-center p-3 col-sm-2 text-center text-decoration-none border" style="width: 337px; height: 400px">
+         <a href="{% url 'product-details' field.category.name field.id %}" class="col-6 col-md-4 d-flex flex-column justify-content-center align-items-center p-3 col-sm-2 text-center text-decoration-none border" style="width: 337px; height: 400px">
             <img src="{{ field.avatar.url }}" alt="" width="240" height="240">
             <p class="d-block">{{ field.name }}</p>
             <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
