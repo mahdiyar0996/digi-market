@@ -1,4 +1,6 @@
 from django.db import models
+from .managers import ProductManager
+from django.db.models import Sum, Count, F
 
 
 class BaseAbstract(models.Model):
@@ -11,7 +13,6 @@ class BaseAbstract(models.Model):
 
 class Category(BaseAbstract):
     avatar = models.ImageField("آواتار", upload_to='products/category/avatar/')
-    pass
 
     def __str__(self):
         return self.name
@@ -46,7 +47,7 @@ class Product(BaseAbstract):
     colour = models.CharField("رنگ", max_length=55, blank=True,)
     stock = models.BigIntegerField("تعداد کالا", blank=True, null=True)
     avatar = models.ImageField('آواتار', blank=True, null=True, upload_to='products/avatar/')
-
+    objects = ProductManager
 
     class Meta:
         db_table = 'products'
@@ -63,11 +64,12 @@ class ProductImage(models.Model):
     images = models.ImageField('عکس ها', upload_to='products/images/', blank=True)
 
     class Meta:
-        db_table = 'product-images'
-        verbose_name = 'product-image'
-        verbose_name_plural = 'products-images'
+        db_table = 'products_images'
+        verbose_name = 'product_image'
+        verbose_name_plural = 'products_images'
     def __str__(self):
         return self.product.name
+
 
 class ProductComment(BaseAbstract):
     choices = [
@@ -86,10 +88,14 @@ class ProductComment(BaseAbstract):
     name = None
 
     class Meta:
-        db_table = 'products-comments'
+        db_table = 'products_comments'
         verbose_name = 'product-comment'
-        verbose_name_plural = 'products-comments'
+        verbose_name_plural = 'products_comments'
         ordering = ['rating', 'updated_at', 'created_at']
 
     def __str__(self):
         return self.user.username
+
+    @staticmethod
+    def is_active_comments(product_id):
+        return ProductComment.objects.select_related('user').filter(product__id=product_id, is_active=True)

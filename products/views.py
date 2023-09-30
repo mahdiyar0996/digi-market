@@ -9,6 +9,7 @@ from .forms import ProductCommentForm
 from django.contrib import messages
 from django.http.response import HttpResponseBadRequest
 from utils.tools import get_average
+from django.core.exceptions import BadRequest
 class CategoryListView(View):
     @debugger
     def get(self, request, category):
@@ -27,20 +28,34 @@ class ProductListView(View):
 class ProductDetailsView(View):
     @debugger
     def get(self, request, category, product_id,):
-        product_comments = ProductComment.objects.select_related('product', 'product__category',
+        # from django.db.models import F
+        # test = Product.objects.filter(productcomment__rating__gt=F('id'))
+        # for i in test:
+        #     print(i.id)
+        product_images = ProductImage.objects.select_related('product', 'product__category',
                                                                  'product__category__category',
-                                                                 'user').filter(product__id=product_id)
-
-        product = product_comments[0].product
-        product_details = product.details.items()
-        average = get_average(product_comments)
-        comment_counts = len(product_comments)
-        product_images = ProductImage.objects.filter(product=product)
-        form = ProductCommentForm
+                                                             ).filter(product__id=product_id)
+        product_comments = ProductComment.is_active_comments(product_id)
+        try:
+            product = product_images[0].product
+            try:
+                product_details = product.details.items()
+            except AttributeError:
+                product_details = None
+            if len(product_comments) > 0:
+                average = get_average(product_comments)
+                comment_counts = len(product_comments)
+            else:
+                average = 0
+                comment_counts = 0
+            form = ProductCommentForm
+        except (IndexError, TypeError):
+            raise BadRequest
         return render(request, 'product-details.html', {'product': product, 'product_images': product_images,
                                                         'product_details': product_details, 'product_comments': product_comments,
                                                         'comment_counts': comment_counts, 'form': form,
                                                         'average': average})
+
     @debugger
     def post(self, request, category, product_id):
         form = ProductCommentForm(request.POST)
@@ -52,6 +67,4 @@ class ProductDetailsView(View):
 
             messages.success(request, 'دیدگاه شما ارسال شد و بعد از تایید شدن قرار گرفته میشود', 'success')
             return redirect('product-details', category, product_id)
-
         return HttpResponseBadRequest
-        # return redirect('product-details', category, product_id)

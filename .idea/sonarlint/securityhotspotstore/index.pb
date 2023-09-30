@@ -79,3 +79,9 @@ S
 #products/static/product-details.css,b/4/b40bef4df18fa13d724898f96383f32bee4d84f8
 W
 'products/templates/product-details.html,f/4/f473b6a133a8e779fd180f7f1e16291f55aab751
+A
+products/forms.py,1/8/18290037a6c6f23e022d2baa2e1e1ce35b23ac91
+>
+utils/tools.py,0/a/0aa6e929889020aa589295631a92e7d86455ad47
+D
+products/managers.py,9/e/9e1d1c62df024f32a90a7e58d7de3a314d1622c7
