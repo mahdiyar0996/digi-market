@@ -8,7 +8,7 @@ class ProductManager(models.Manager):
         model.productimage.images = model.avatar
         model.productimage.model = model
         model.save()
-        model.productimage.save()
+        model.productimage.save(force_insert=True)
         return model
 
 

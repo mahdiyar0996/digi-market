@@ -50,18 +50,99 @@
             </li>
             <li class="d-inline-block ms-3 text-info">{{ comment_counts }}دیدگاه </li>
         </ul>
-        <div class="ms-3">
-            <h5 class="mb-5" style="font-family: KacstPen">
-                ویژه گی ها
-            </h5>
-            {% for key,value in product_details %}
-                <div class="d-flex flex-row">
-            <p class="me-4">{{ key }}:</p>
-                <p>{{ value }}</p>
+        <div class="ms-3 row flex-row">
+            <div class="col-6">
+                <h5 class="mb-5" style="font-family: KacstPen">
+                    ویژه گی ها
+                </h5>
+                {% for key,value in product_details %}
+                    <div class="d-flex flex-row">
+                <p class="me-4">{{ key }}:</p>
+                    <p>{{ value }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <form class="col-6 flex-column justify-content-start card d-none d-md-flex" method="get" action="">
+                <div class="my-2 d-block">
+                    <img src="/media/site_images/logo%20image.jpg" width="16" height="16"></img>
+                    دیجی مارکت
                 </div>
-            {% endfor %}
+                <div class="my-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
+                      <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+                      <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                    </svg>
+                    گارانتی {{ product.warranty }}
+                </div>
+                {% if product.stock > 5 %}
+                    <div class="my-2 text-success">موجود در انبار</div>
+                {% elif product.stock < 10%}
+                    <div class="text-muted my-2">تنها{{ product.stock }}کالا باقی مانده</div>
+                {% endif %}
+                <div class="text-end mb-4 mt-2">{{ product.price }}تومان</div>
+                {% if not is_in_basket %}
+                <button class="btn btn-danger text-center" type="submit" name="add-to-basket" value="{{ product.name }}">افزودن به سبد خرید</button>
+                {% else %}
+                    <div class="bg-danger text-center">به سبد خرید شما اضافه شد</div>
+                    <div class="card my-2 p-2 d-inline" style="width: 150px">
+                    <button class="btn align-items-center" type="submit" style="width: 32px; height: 32px" name="add-more" value="{{ product.name }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger bi bi-plus-lg fw-bolder mb-3" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                        </svg>
+                    </button>
+                        <div class="d-inline-flex justify-content-center align-items-center" style="width: 32px; height: 32px">
+                        {{ is_in_basket.count }}
+                        </div>
+                    <button class="btn"  type="submit" style="width: 32px; height: 32px" name="delete-from-basket" value="{{ product.name }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger bi bi-trash mb-3" viewBox="0 0 16 16">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                        </svg>
+                    </button>
+                    </div>
+                {% endif %}
+            </form>
         </div>
     </div>
+    <form class="col-12 flex-column justify-content-start card d-md-none" action="" method="GET">
+        <div class="my-2">
+            <img src="/media/site_images/logo%20image.jpg" width="16" height="16"></img>
+            دیجی مارکت
+        </div>
+        <div class="my-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
+              <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+              <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+            </svg>
+            گارانتی {{ product.warranty }}
+        </div>
+        {% if product.stock > 10 %}
+            <div class="my-2 text-success">موجود در انبار</div>
+        {% elif product.stock < 10%}
+            <div class="text-muted my-2">تنها{{ product.stock }}کالا باقی مانده</div>
+        {% endif %}
+            {% if not is_in_basket %}
+            <button class="btn btn-danger text-center" type="submit" name="add-to-basket" value="{{ product.name }}">افزودن به سبد خرید</button>
+            {% else %}
+            <div class="bg-danger text-center">به سبد خرید شما اضافه شد</div>
+            <div class="card my-2 p-2 d-inline" style="width: 150px">
+            <button class="btn align-items-center" type="submit" style="width: 32px; height: 32px" name="add-more" value="{{ product.name }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger bi bi-plus-lg fw-bolder mb-3" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                </svg>
+            </button>
+                <div class="d-inline-flex justify-content-center align-items-center" style="width: 32px; height: 32px">
+                {{ is_in_basket.count }}
+                </div>
+            <button class="btn"  type="submit" style="width: 32px; height: 32px" name="delete-from-basket" value="{{ product.name }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger bi bi-trash mb-3" viewBox="0 0 16 16">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+    </form>
     {% if product.description %}
     <hr>
     <div class="col-12 my-2 px-4">
@@ -95,7 +176,7 @@
         <div class="card-body">
             {{ comment.comment }}
         </div>
-    </div>
+    </div >
 {% endfor %}
 </div>
     <div class="row">
@@ -107,7 +188,7 @@
                 {{ field.label }}
                 {% if field.name != 'rating' %}
                     <textarea class="text-start form-text" type="{{ field.widget_type }}" placeholder="{{ field.help_text }}" id="{{ field.name }}" style="width: 100%;min-height: 100px;max-height: 140px" required name="{{ field.name }}"></textarea>
-                    {% else %}
+                {% else %}
                     <select class="form-select" style="width: 80px" name="{{ field.name }}" id="{{ field.name }}" required >
                         {% for option in field %}
                             {{ option }}

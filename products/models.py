@@ -82,8 +82,8 @@ class ProductComment(BaseAbstract):
 
     product = models.ForeignKey(Product,verbose_name='کالا', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
     user = models.ForeignKey('users.User', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
-    rating = models.SmallIntegerField("امتیاز", blank=True, null=True, choices=choices, db_index=True)
-    comment = models.TextField('دیدگاه', default=5)
+    rating = models.SmallIntegerField("امتیاز", choices=choices, db_index=True)
+    comment = models.TextField('دیدگاه')
     is_active = models.BooleanField('وضعیت', default=False, db_index=True)
     name = None
 

@@ -107,7 +107,7 @@ class Profile(models.Model):
     job = models.CharField('شغل', blank=True, null=True, max_length=55)
     updated_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        db_table = 'profiles'
+        db_table = 'users-profiles'
         verbose_name = 'profile'
         verbose_name_plural = 'profiles'
 
@@ -127,3 +127,14 @@ class Profile(models.Model):
         self.age = kwargs.get('age', self.age)
         self.job = kwargs.get('job', self.job)
         super().save()
+
+class UserBasket(models.Model):
+    product = models.ForeignKey('products.Product', verbose_name='کالا', unique=True, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
+    user = models.ForeignKey(User, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
+    count = models.SmallIntegerField(verbose_name='تعداد', blank=True, default=1)
+
+
+    class Meta:
+        db_table = 'users-basket'
+        verbose_name = 'basket'
+        verbose_name_plural = 'baskets'
