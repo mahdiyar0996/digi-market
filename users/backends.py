@@ -7,7 +7,7 @@ class EmailUsernameAuthentication(object):
     @staticmethod
     def authenticate(request, email=None, username=None, password=None):
         try:
-            user = User.objects.get(Q(username__exact=username)|
+            user = User.objects.get(Q(username__exact=username) |
                                     Q(email__exact=email)
                                     )
         except User.DoesNotExist:

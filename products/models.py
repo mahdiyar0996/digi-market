@@ -1,3 +1,5 @@
+import string
+
 from django.db import models
 from .managers import ProductManager
 from django.db.models import Sum, Count, F
@@ -41,12 +43,12 @@ class Product(BaseAbstract):
     details = models.JSONField("جزییات", blank=True, null=True)
     warranty = models.CharField("گارانتی", max_length=255, blank=True)
     tag = models.CharField(max_length=55, blank=True, db_index=True)
-    price = models.BigIntegerField("قیمت", blank=True, null=True)
-    discount = models.CharField('تخفیف', max_length=55, blank=True)
+    price = models.BigIntegerField("قیمت",)
+    discount = models.IntegerField('تخفیف', blank=True)
     is_active = models.BooleanField('وضعیت', default=True, db_index=True)
     colour = models.CharField("رنگ", max_length=55, blank=True,)
     stock = models.BigIntegerField("تعداد کالا", blank=True, null=True)
-    avatar = models.ImageField('آواتار', blank=True, null=True, upload_to='products/avatar/')
+    avatar = models.ImageField('آواتار', blank=True, upload_to='products/avatar/')
     objects = ProductManager
 
     class Meta:
@@ -54,6 +56,16 @@ class Product(BaseAbstract):
         verbose_name = 'product'
         verbose_name_plural = 'products'
         ordering = ['created_at', 'stock', 'price']
+
+    def get_discount(self):
+        discount = self.price * self.discount // 100
+        discounted_price = self.price - discount
+        price = "{:,}".format(int(discounted_price))
+        return price
+
+    def split_price(self):
+        price = "{:,}".format(self.price)
+        return price
 
     def __str__(self):
         return self.name
@@ -98,4 +110,4 @@ class ProductComment(BaseAbstract):
 
     @staticmethod
     def is_active_comments(product_id):
-        return ProductComment.objects.select_related('user').filter(product__id=product_id, is_active=True)
+        return ProductComment.objects.select_related('user').filter(product__id=product_id)

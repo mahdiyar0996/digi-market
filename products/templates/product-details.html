@@ -62,7 +62,8 @@
                     </div>
                 {% endfor %}
             </div>
-            <form class="col-6 flex-column justify-content-start card d-none d-md-flex" method="get" action="">
+            <form class="col-6 flex-column justify-content-start card d-none d-md-flex" method="POST" action="">
+            {% csrf_token %}
                 <div class="my-2 d-block">
                     <img src="/media/site_images/logo%20image.jpg" width="16" height="16"></img>
                     دیجی مارکت
@@ -74,12 +75,24 @@
                     </svg>
                     گارانتی {{ product.warranty }}
                 </div>
-                {% if product.stock > 5 %}
+                {% if product.stock > 10 %}
                     <div class="my-2 text-success">موجود در انبار</div>
                 {% elif product.stock < 10%}
-                    <div class="text-muted my-2">تنها{{ product.stock }}کالا باقی مانده</div>
+                    <div class="text-danger my-2">تنها{{ product.stock }}کالا باقی مانده</div>
                 {% endif %}
-                <div class="text-end mb-4 mt-2">{{ product.price }}تومان</div>
+                {% if not product.discount > 0 %}
+                <div class="text-end mb-4 mt-2">{{ product.split_price }}تومان</div>
+                {% else %}
+                    <div class="d-flex justify-content-end">
+                        <div class="me-5">
+                    <span class="text-end mb-4 mt-2 text-decoration-line-through  text-muted">
+                        {{ product.get_discount }}تومان
+                    </span>
+                    <span class="text-body bg-danger strong fw-light" style="height: 24px;width: 32px">{{ product.discount }}%</span>
+                        </div>
+                    </div>
+                    <div class="text-end mb-4 mt-2 ">{{ product.split_price }}تومان</div>
+                {% endif %}
                 {% if not is_in_basket %}
                 <button class="btn btn-danger text-center" type="submit" name="add-to-basket" value="{{ product.name }}">افزودن به سبد خرید</button>
                 {% else %}
@@ -104,9 +117,10 @@
             </form>
         </div>
     </div>
-    <form class="col-12 flex-column justify-content-start card d-md-none" action="" method="GET">
+    <form class="col-12 flex-column justify-content-start card d-md-none" action="" method="POST">
+    {% csrf_token %}
         <div class="my-2">
-            <img src="/media/site_images/logo%20image.jpg" width="16" height="16"></img>
+            <img src="/media/site_images/logo%20image.jpg" width="16" height="16">
             دیجی مارکت
         </div>
         <div class="my-2">
@@ -119,7 +133,7 @@
         {% if product.stock > 10 %}
             <div class="my-2 text-success">موجود در انبار</div>
         {% elif product.stock < 10%}
-            <div class="text-muted my-2">تنها{{ product.stock }}کالا باقی مانده</div>
+            <div class="text-danger my-2">تنها{{ product.stock }}کالا باقی مانده</div>
         {% endif %}
             {% if not is_in_basket %}
             <button class="btn btn-danger text-center" type="submit" name="add-to-basket" value="{{ product.name }}">افزودن به سبد خرید</button>
@@ -149,8 +163,8 @@
         <h4 class="d-flex col-4 col-md-4 col-lg-3 justify-content-evenly mb-3">درباره کالا</h4>
         {{ product.description }}
     </div>
-    <hr>
     {% endif %}
+    <hr>
 </div>
     <ul class="list-unstyled mx-5 d-block">
         <li>
@@ -162,6 +176,7 @@
     <hr>
 <div class="row px-4 collapse" id="comments">
 {% for comment in product_comments %}
+    {% if comment.is_active %}
     <div class="card pt-3 mb-5 ms-3" style="width: 800px">
         <p class="card-title d-flex justify-content-between" style="width: 300px">
             {{ comment.user.username }}
@@ -177,6 +192,7 @@
             {{ comment.comment }}
         </div>
     </div >
+{% endif %}
 {% endfor %}
 </div>
     <div class="row">

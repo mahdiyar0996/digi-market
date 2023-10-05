@@ -1,0 +1,117 @@
+{% extends 'index.html' %}
+{% block title %}
+
+{% endblock %}
+{% block css %}
+<style>
+#product-image{
+    width: 150px;
+    height: 200px;
+}
+@media only screen and (max-width: 540px) {
+    #product-image {
+        width: 114px;
+        height: 206px;
+                    }
+                }
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row flex-row flex-nowrap justify-content-center justify-content-md-start">
+        <div class="card col-3 mt-5 d-none d-md-block" style="min-width: 250px;max-width: 300px; height: 100%;">
+            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar}}"
+                                                                class="w-50 h-100 border rounded-circle" alt="">
+                <a href="{% url 'profile' %}" class="text-decoration-none">{{ user.username }}</a>
+            </div>
+            <hr>
+            <div class="card-body">
+                <a href="" class="d-flex justify-content-between align-items-center text-decoration-none">موجودی {% if user.credits == None %}0{% else %}{{ user.credits }}{% endif %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-back-fill" viewBox="0 0 16 16">
+                         <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5H0V4zm11.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2zM0 11v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1H0z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="{% url 'checkout' %}" class="d-flex align-items-center justify-content-between text-decoration-none">سبد خرید
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                  <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                </a>
+                <hr>
+                <a href="" class="d-flex align-items-center justify-content-between text-decoration-none">سفارش ها
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
+                      <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="http://" class="d-flex align-items-center justify-content-between text-decoration-none">دیدگاه ها
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-fill" viewBox="0 0 16 16">
+                      <path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="" class="d-flex align-items-center justify-content-between text-decoration-none">پیقام ها
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                      <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="" class="d-flex align-items-center justify-content-between text-decoration-none">بازدید های اخیر
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="{% url 'personal_info' %}" class="d-flex align-items-center justify-content-between text-decoration-none">اطلاعات حساب کاربری
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                      <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                    </svg>
+                </a>
+                <hr>
+                <a href="{% url 'logout' %}" class="d-flex align-items-center justify-content-between text-decoration-none">خروج
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                      <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="col-12 col-md-9 card justify-content-center align-items-center mt-5 px-3">
+            {% for product in products %}
+            <div class="my-3 row flex-column w-100">
+                <div class="row flex-row my-3 justify-content-between">
+                    <div class=" col-3">
+                        <a href="{% url 'product-details' product.category_name product.products_id %}">
+                        <img src="{{ product.products_avatar }}" id="product-image">
+                        </a>
+                    </div>
+                <div class="col-7 col-sm-5 col-md-5 col-lg-6 flex-column">
+                    <p>{{ product.products_name }}</p>
+                    {% for key,value in product.products_details.items %}
+                    <p style="font-size: 14px">
+                            {{ key }} : {{ value }}
+                    </p>
+                    {% endfor %}
+                    {% if product.products_stock > 10 %}
+                    <div class="my-2 text-success">موجود در انبار</div>
+                    {% elif product.products_stock < 10%}
+                    <div class="text-danger my-2">تنها{{ product.products_stock }}کالا باقی مانده</div>
+                    {% endif %}
+                </div>
+                <div class="col-12  col-md-4 col-lg-3">
+                    <form class="card justify-content-start align-items-center" method="POST" action="">
+                        <p class="card-title mt-2">دیجی مارکت<img src="/media/site_images/logo%20image.jpg" width="16" height="16"></p>
+                        <p>گارانتی : <span class="text-muted">{{ product.products_warranty }}</span></p>
+                        <p class="text-end">تومان{{ product.products_price }}</p>
+                        <button class="btn btn-danger mb-3" type="submit" name="submit-order">ثبت سفارش</button>
+                    </form>
+                </div>
+                </div>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <div class="row flex-row flex-nowrap justify-content-center justify-content-md-start">
         <div class="card col-3 mt-5 d-none d-md-block" style="min-width: 250px;max-width: 300px; height: 100%;">
-            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar.url}}"
+            <div class="card-title w-100 text-center mt-5"><img src="{{ profile.avatar}}"
                                                                 class="w-50 h-100 border rounded-circle" alt="">
                 <a href="{% url 'profile' %}" class="text-decoration-none">{{ user.username }}</a>
             </div>
@@ -21,7 +21,7 @@
                     </svg>
                 </a>
                 <hr>
-                <a href="" class="d-flex align-items-center justify-content-between text-decoration-none">سبد خرید
+                <a href="{% url 'checkout' %}" class="d-flex align-items-center justify-content-between text-decoration-none">سبد خرید
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
                   <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
                 </svg>
@@ -87,7 +87,7 @@
                         </label>
                         <input type="{{ field.widget_type }}" class="border rounded form-control text-start"
                                placeholder="{{ field.help_text }}" {% if field.name != 'password' %}
-                               value="{% if field.value %}{{ field.value }}{% endif %}"{% else %}disabled{% endif %} name="{{ field.name }}">
+                               value="{% if field.value %}{{ field.value }}{% endif %}" {% else %}disabled{% endif %} name="{{ field.name }}">
                         </div>
                     {% endfor %}
                      <div class="d-flex justify-content-center">

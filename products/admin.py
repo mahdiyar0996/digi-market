@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Product, ProductImage, ProductComment, Category, SubCategory
+import json
 
 
 @admin.register(Category)
@@ -35,6 +36,15 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
     list_display = ['id', 'name', 'price', 'discount', 'tag', 'stock', 'is_active', 'created_at', 'updated_at']
     inlines = [ProductImageAdmin,]
+
+    def save_model(self, request, obj, form, change):
+        try:
+            ProductImage.objects.get_or_create(product=obj, images=obj.avatar)
+        except ProductImage.MultipleObjectsReturned:
+            pass
+        # if obj.colour:
+        #     obj.colour = json.dumps(obj.colour.split(','))
+        super().save_model(request, obj, form, change)
 
 @admin.register(ProductComment)
 class ProductCommentAdmin(admin.ModelAdmin):

@@ -1,13 +1,17 @@
 from django.db import models
-
-from django.contrib.auth import get_user_model
+from django.db.models import F
 from django.contrib.auth.models import (BaseUserManager,
                                         AbstractBaseUser,
                                         PermissionsMixin,)
-from django.utils import timezone
 from utils.validators import valid_email,valid_username, valid_phone_number, valid_password
-from django.core.validators import RegexValidator
 from django.forms.models import model_to_dict
+from django_redis import get_redis_connection
+import json
+from django.core.cache import cache as django_cache
+
+cache = get_redis_connection('default')
+
+
 class AbstractBase(models.Model):
     created_at = models.DateTimeField(auto_now=True, null=True)
     updated_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -56,9 +60,9 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
                                     error_messages={'unique': 'این شماره قبلا انتخاب شده است',
                                                     'invalid': 'شماره وارد شده نا معتبر است'})
     credits = models.BigIntegerField('موجودی', null=True, blank=True)
-    password = models.CharField('رمز عبور',max_length=255,
+    password = models.CharField('رمز عبور', max_length=255,
                                 error_messages={'invalid': 'رمز کاربری باید ۸ کاراکتر یا بیشتر باشد و یک حرف بزرگ داشته باشد'})
-    city = models.CharField('شهر',max_length=55, blank=True, null=True, db_index=True)
+    city = models.CharField('شهر', max_length=55, blank=True, null=True, db_index=True)
     address = models.TextField('ادرس', max_length=555, blank=True, null=True)
     is_superuser = models.BooleanField('ادمین', default=False, db_index=True)
     is_staff = models.BooleanField('کارکنان', default=False, db_index=True)
@@ -89,6 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
 
     def get_model_fields(self):
         return self._meta.get_fields()
+
     def save(self, *args, **kwargs):
         self.username = kwargs.get('username', self.username)
         self.email = kwargs.get('email', self.email)
@@ -97,20 +102,21 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         self.address = kwargs.get('address', self.address)
         super().save()
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, primary_key=True, related_name='%(class)s', blank=True, on_delete=models.CASCADE)
-    avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='media/users/profile/',
+    avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='users/profile/',
                                default='users/profile/default.jpg')
     first_name = models.CharField('نام', max_length=55, null=True, blank=True)
     last_name = models.CharField('نام خانوادگی', max_length=55, blank=True, null=True)
     age = models.SmallIntegerField('تاریخ تولد', blank=True, null=True)
     job = models.CharField('شغل', blank=True, null=True, max_length=55)
     updated_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         db_table = 'users-profiles'
         verbose_name = 'profile'
         verbose_name_plural = 'profiles'
-
 
     def __str__(self):
         return self.user.username
@@ -128,9 +134,26 @@ class Profile(models.Model):
         self.job = kwargs.get('job', self.job)
         super().save()
 
+    @classmethod
+    def get_user_and_profile(cls, request, user: User):
+        profile = cls.objects.select_related('user').values('avatar', 'first_name', 'last_name', 'job', 'age',
+                                                              'user__username', 'user__email', 'user__phone_number',
+                                                              'user__credits', 'user__city', 'user__address',
+                                                              'user__address').get(user=user)
+        profile['avatar'] = request.build_absolute_uri("/media/" + profile['avatar'])
+        user_data = {key.replace('user__', ''): value for key, value in profile.items() if 'user' in key}
+        with cache.pipeline() as pipeline:
+            pipeline.hset(f'user{user.id}', mapping=user_data)
+            pipeline.expire(f"user{user.id}", 7200)
+            pipeline.hset(f'profile{user.id}', mapping=profile)
+            pipeline.expire(f"profile{user.id}", 7200)
+            pipeline.execute()
+        return user_data, profile
+
+
 class UserBasket(models.Model):
-    product = models.ForeignKey('products.Product', verbose_name='کالا', unique=True, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
-    user = models.ForeignKey(User, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
+    product = models.OneToOneField('products.Product', verbose_name='کالا', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
+    profile = models.ForeignKey(Profile, related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
     count = models.SmallIntegerField(verbose_name='تعداد', blank=True, default=1)
 
 
@@ -138,3 +161,27 @@ class UserBasket(models.Model):
         db_table = 'users-basket'
         verbose_name = 'basket'
         verbose_name_plural = 'baskets'
+
+    @classmethod
+    def filter_basket_products(cls, request, user: User):
+        products = cls.objects.select_related('product', 'profile', 'profile__user').\
+            annotate(category_name=F('product__category__name'),
+                     products_avatar=F('product__avatar'), products_id=F('product__id'),
+                     products_details=F('product__details'),
+                     products_stock=F('product__stock'),
+                     products_price=F('product__price'),
+                     products_warranty=F('product__warranty')).\
+            values('category_name', 'products_avatar', 'products_details',
+                   'products_stock', 'products_price', 'products_warranty',
+                   'products_id').\
+            filter(profile__user=user)
+        # pipeline = cache.pipeline()
+        for item in products:
+            item['products_avatar'] = request.build_absolute_uri("/media/" + item['products_avatar'])
+            item['products_price'] = "{:,}".format(item['products_price'])
+
+        django_cache.set(f'user_basket{user.id}', products, 7200)
+        # pipeline.set(f'user_basket{user.id}', json.dumps(list(products)))
+        # pipeline.expire(f'user_basket{user.id}', 7200)
+        # pipeline.execute()
+        return products

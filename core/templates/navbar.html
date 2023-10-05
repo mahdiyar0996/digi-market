@@ -7,7 +7,7 @@
         </button>
         <a class="navbar-brand col-9 col-md-10 col-lg-2 text-center" href="{% url 'home' %}">دیجی مارکت</a>
         <div class="collapse navbar-collapse grid justify-content-center align-items-center" id="navbarSupportedContent">
-        <form class="d-flex mt-md-2 mt-lg-0 col-md-6 justify-content-center align-items-center" role="search" method="GET" action="">
+        <form class="d-flex mt-2 mt-lg-0 col-md-6 justify-content-center align-items-center" role="search" method="GET" action="">
             <input class="form-control me-2" type="search" placeholder="جستجو" aria-label="Search">
             <button class="btn btn-outline-success d-none" type="submit">جستجو</button>
       </form>
@@ -18,7 +18,7 @@
                 <li class="nav-item mx-1">
                     <a class="nav-link " href="#">سوالی دارید</a>
                 </li>
-                {% if not user.is_authenticated%}
+                {% if not user%}
                 <li class="nav-item mx-1">
                     <a class="nav-link mx-2" href="{% url 'login' %}">ورود</a>
                 </li>
@@ -27,7 +27,7 @@
                 </li>
                 {% endif %}
             </ul>
-              {% if user.is_authenticated %}
+              {% if user %}
             <ul class="nav-item dropdown mb-2 mb-lg-0" style="justify-self: end">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 پروفایل

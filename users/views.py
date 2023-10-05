@@ -7,13 +7,16 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm, PasswordResetSendTokenForm, PasswordResetForm, UserForm
 from .tokens import email_verification_token
-from .models import User, Profile
+from .models import User, Profile, UserBasket
 from .backends import EmailUsernameAuthentication as Eua
 from django.contrib.auth.tokens import PasswordResetTokenGenerator as Prtg
 from utils.email_senders import send_token_email
 from utils.decorators import debugger
 from datetime import datetime
-from django.core.cache import cache
+from main.settings import cache
+import json
+from django.core.cache import cache as django_cache
+
 
 class RegisterView(View):
     def get(self, request):
@@ -65,11 +68,11 @@ class RegisterCompleteView(View):
 
 
 class LoginView(View):
+    @debugger
     def get(self, request):
         form = LoginForm()
-
         return render(request, 'login.html', {'form': form})
-
+    @debugger
     def post(self, request):
         form = LoginForm(request.POST, initial=request.POST)
         if form.is_valid():
@@ -83,15 +86,16 @@ class LoginView(View):
             if user is not None:
                 user.ipaddress = request.META.get('REMOTE_ADDR')
                 user.save()
-                if remember:
+                request.session['sessionid'] = user.id
+                if remember is True:
                     request.session.set_expiry(0)
+                request.session.set_expiry(60 * 60 * 24)
                 login(request, user)
                 return redirect('profile')
-
             return render(request, 'login.html', {'form': form}, status=400)
-
         messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
         return render(request, 'login.html', {'form': form}, status=400)
+
 
 class Logout(View):
     def get(self, request):
@@ -156,27 +160,22 @@ class PasswordResetCompleteView(View):
 class ProfileView(View):
     @debugger
     def get(self, request):
-        user = cache.get(request.COOKIES.get('sessionid'))
-        if not user:
-            user = request.user
-            cache.set(request.COOKIES.get('sessionid'), user)
-        if hasattr(user, 'profile'):
-            profile = user.profile
-        else:
-            profile = Profile.objects.create(user=user, first_name=user.first_name)
+        user = cache.hgetall(f'user{request.session["sessionid"]}')
+        profile = cache.hgetall(f'profile{request.session["sessionid"]}')
+        if not any([len(user) > 0, len(profile) > 0]):
+            user, profile = Profile().get_user_and_profile(request, request.user)
         return render(request, 'profile.html', {'user': user, 'profile': profile})
 
 
 class ProfileChangeView(View):
     @debugger
     def get(self, request):
-        # user = cache.get(request.COOKIES.get('sessionid'))
-        # if not user:
-        profile = Profile.objects.select_related('user').get(user=request.user)
-        user = request.user
-        user_data: dict = profile.to_dict()
-        user_data.update(profile.user.to_dict())
-        form = UserForm(initial=user_data)
+        user = cache.hgetall(f'user{request.session["sessionid"]}')
+        profile = cache.hgetall(f'profile{request.session["sessionid"]}')
+        if not any([len(user) > 0, len(profile) > 0]):
+            user, profile = Profile.get_user_and_profile(request, request.user)
+        data = user | profile
+        form = UserForm(initial=data)
         return render(request, 'personal_info.html', {'form': form,
                                                       'profile': profile,
                                                       'user': user})
@@ -188,12 +187,21 @@ class ProfileChangeView(View):
             user.save(**cd)
             user.profile.save(**cd)
             return redirect('profile')
-
         return render(request, 'personal_info.html', {'form': form, 'user': user,
                                                       'profile': user.profile})
 
 
-
+class ProfileBasket(View):
+    @debugger
+    def get(self, request):
+        user = cache.hgetall(f"user{request.session['sessionid']}")
+        profile = cache.hgetall(f"user{request.session['sessionid']}")
+        products = django_cache.get(f"user_basket{request.session['sessionid']}")
+        if any([len(user) <= 0, len(profile) <= 0]):
+            user, profile = Profile.get_user_and_profile(request, request.user)
+        if len(products) <= 0:
+            products = products = UserBasket.filter_basket_products(request, request.user)
+        return render(request, 'profile-basket.html', {'products': products, 'user': user, 'profile': profile})
 
 
 

@@ -14,6 +14,7 @@ from django.http.response import HttpResponseBadRequest
 from utils.tools import get_average, get_avg, get_count
 from django.core.exceptions import BadRequest
 from django.db import IntegrityError
+from sys import getsizeof
 class CategoryListView(View):
     @debugger
     def get(self, request, category):
@@ -25,10 +26,8 @@ class CategoryListView(View):
 class ProductListView(View):
     @debugger
     def get(self, request, category):
-        products = Product.objects.select_related('category').filter(category__name=category)
-        print(products)
-        products_comments_average = ProductComment.objects.select_related('product').filter(is_active=True, product__in=products).annotate(average=Avg('rating'))
-        return render(request, 'product-list.html', {'products': products, 'products_comments_average': products_comments_average})
+        products = Product.objects.select_related('category').filter(category__name=category).annotate(average=Avg('productcomment__rating'))
+        return render(request, 'product-list.html', {'products': products})
 
 
 class ProductDetailsView(View):
@@ -47,39 +46,16 @@ class ProductDetailsView(View):
                 product_details = None
             if len(product_comments) > 0:
                 average = get_average(product_comments)
-                comment_counts = len(product_comments)
+                comment_counts = get_count(product_comments)
             else:
                 average = 0
                 comment_counts = 0
         except (IndexError, TypeError):
             raise BadRequest
-
         try:
-            if request.GET.get('delete-from-basket', False):
-                UserBasket.objects.filter(user=request.user, product=product).delete()
-
-        except (UserBasket.DoesNotExist):
-            pass
-        if request.GET.get('add-to-basket', False):
-            try:
-                add_to_basket = UserBasket.objects.create(user=request.user, product=product)
-                is_in_basket = add_to_basket
-            except IntegrityError:
-                is_in_basket = UserBasket.objects.get(user=request.user, product=product)
-        if request.GET.get('add-more', False):
-            try:
-                add_more_to_basket = UserBasket.objects.get(user=request.user, product=product)
-                add_more_to_basket.count += 1
-                add_more_to_basket.save()
-                is_in_basket = add_more_to_basket
-            except (UserBasket.DoesNotExist, IntegrityError):
-                pass
-
-        else:
-            try:
-                is_in_basket = UserBasket.objects.get(user=request.user, product=product)
-            except UserBasket.DoesNotExist:
-                is_in_basket = None
+            is_in_basket = UserBasket.objects.get(profile__user=request.user, product=product)
+        except UserBasket.DoesNotExist:
+            is_in_basket = None
         return render(request, 'product-details.html', {'product': product, 'product_images': product_images,
                                                         'product_details': product_details, 'product_comments': product_comments,
                                                         'comment_counts': comment_counts, 'form': form,
@@ -87,14 +63,35 @@ class ProductDetailsView(View):
                                                         'is_in_basket': is_in_basket})
     @debugger
     def post(self, request, category, product_id):
-        form = ProductCommentForm(request.POST)
-        if form.is_valid():
-            product_name = Product.objects.get(id__exact=product_id, category__name__exact=category)
-            cp = form.cleaned_data
-            ProductComment.objects.create(product=product_name, user=request.user,
-                                                    comment=cp['comment'], rating=cp['rating'])
+        try:
+            if request.POST.get('delete-from-basket', False):
+                UserBasket.objects.filter(user=request.user, product__id=product_id).delete()
 
-            messages.success(request, 'دیدگاه شما ارسال شد و بعد از تایید شدن قرار گرفته میشود', 'success')
-            return redirect('product-details', category, product_id)
-        print(form.errors)
-        return HttpResponseBadRequest
+        except (UserBasket.DoesNotExist):
+            pass
+        if request.POST.get('add-to-basket', False):
+            try:
+                product = Product.objects.get(id=product_id)
+                UserBasket.objects.create(profile=request.user.profile, product=product)
+            except IntegrityError:
+                pass
+        if request.POST.get('add-more', False):
+            try:
+                add_more_to_basket = UserBasket.objects.get(user=request.user, product__id=product_id)
+                add_more_to_basket.count += 1
+                add_more_to_basket.save()
+            except (UserBasket.DoesNotExist, IntegrityError):
+                pass
+
+        if request.POST.get('comment'):
+            form = ProductCommentForm(request.POST)
+            if form.is_valid():
+                product_name = Product.objects.get(id__exact=product_id, category__name__exact=category)
+                cp = form.cleaned_data
+                ProductComment.objects.create(product=product_name, user=request.user,
+                                                        comment=cp['comment'], rating=cp['rating'])
+
+                messages.success(request, 'دیدگاه شما ارسال شد و بعد از تایید شدن قرار گرفته میشود', 'success')
+                return redirect('product-details', category, product_id)
+            return HttpResponseBadRequest
+        return redirect('product-details', category, product_id)

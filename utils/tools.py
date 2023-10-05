@@ -7,8 +7,9 @@ def get_avg(iterable: list):
 def get_count(iterable: list):
     count = 0
     for item in iterable:
-        count += 1
-    return  count
+        if item.is_active == True:
+            count += 1
+    return count
 
 def get_average(iterable):
     sum_comment_rating = sum([rate.rating for rate in iterable])

@@ -12,7 +12,7 @@
   <div class="carousel-inner">
       {% for image in header %}
     <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
-      <img src="{{image.image.url}}" class="d-block img-fluid" alt="..." >
+      <img src="{{ request.build_absolute_uri }}{{image.image.url}}" class="d-block img-fluid" alt="..." >
     </div>
       {% endfor %}
   </div>
