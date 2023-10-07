@@ -3,6 +3,8 @@ import string
 from django.db import models
 from .managers import ProductManager
 from django.db.models import Sum, Count, F
+from main.settings import cache
+from django.core.cache import cache as django_cache
 
 
 class BaseAbstract(models.Model):
@@ -35,6 +37,30 @@ class SubCategory(BaseAbstract):
         db_table = "sub_categories"
         verbose_name = 'sub_category'
         verbose_name_plural = 'sub_categories'
+
+    @classmethod
+    def get_subcategory_and_category(cls, request):
+        subcategory = cls.objects.select_related('category').annotate(category_name=F('category__name'),
+                                                                              category_avatar=F('category__avatar')).\
+                                                                                values('category_name',
+                                                                                       'category_avatar',
+                                                                                       'name', 'avatar').all()
+        category = set()
+        pipeline = cache.pipeline()
+        for item in subcategory:
+            avatar = item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
+            data = ('category_name', item['category_name'],
+                    'category_avatar', request.build_absolute_uri('/media/' + item['category_avatar']))
+            category.add(data)
+            item.pop('category_name')
+            item.pop('category_avatar')
+            pipeline.hset('subcategory', mapping={'category_name': item['name'], 'category_avatar': avatar})
+        pipeline.execute()
+        category = [{item[0]: item[1], item[2]: item[3]} for item in category]
+        django_cache.set('category', category)
+        django_cache.set('subcategory', subcategory)
+        print(category)
+        return subcategory, category
 
 
 class Product(BaseAbstract):

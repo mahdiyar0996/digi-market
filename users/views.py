@@ -58,7 +58,7 @@ class RegisterCompleteView(View):
             user = User.objects.get(pk=uid)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
-        if user is not None and email_verification_token.check_token(user, token):
+        if user and email_verification_token.check_token(user, token):
             user.is_active = True
             user.save()
             return redirect('login')
@@ -72,6 +72,7 @@ class LoginView(View):
     def get(self, request):
         form = LoginForm()
         return render(request, 'login.html', {'form': form})
+
     @debugger
     def post(self, request):
         form = LoginForm(request.POST, initial=request.POST)
@@ -191,15 +192,15 @@ class ProfileChangeView(View):
                                                       'profile': user.profile})
 
 
-class ProfileBasket(View):
+class ProfileBasketView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f"user{request.session['sessionid']}")
-        profile = cache.hgetall(f"user{request.session['sessionid']}")
-        products = django_cache.get(f"user_basket{request.session['sessionid']}")
-        if any([len(user) <= 0, len(profile) <= 0]):
+        user = cache.hgetall(f"user{request.session.get('sessionid', False)}")
+        profile = cache.hgetall(f"profile{request.session.get('sessionid', False)}")
+        products = django_cache.get(f"user_basket{request.session.get('sessionid', False)}")
+        if user and products:
             user, profile = Profile.get_user_and_profile(request, request.user)
-        if len(products) <= 0:
+        if products:
             products = products = UserBasket.filter_basket_products(request, request.user)
         return render(request, 'profile-basket.html', {'products': products, 'user': user, 'profile': profile})
 

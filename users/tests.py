@@ -1,5 +1,6 @@
 from django.test import TestCase, TransactionTestCase
 from .models import User
+from django.shortcuts import reverse
 from django.db.utils import IntegrityError
 from django.contrib.auth import login
 import django
@@ -68,13 +69,20 @@ class Mytest(TransactionTestCase):
     def test_login_view(self):
         self.client.login(username=self.u1.username, password=self.u1.password)
         self.client.login(email=self.u1.email, password=self.u1.password)
-        instance6 = self.client.post('/login/', {'username': self.u1.username, 'password': "Test0996"})
-        instance7 = self.client.post('/login/', {'username': self.u1.email, 'password': "Test0996"})
-        instance8 = self.client.post('/login/', {'username': self.u1.email, 'password': "Test09966"})
+        instance6 = self.client.post(reverse('login'), data={'username': self.u1.username, 'password': "Test0996"})
+        instance7 = self.client.post(reverse('login'), data={'username': self.u1.email, 'password': "Test0996"})
+        instance8 = self.client.post(reverse('login'), data={'username': self.u1.email, 'password': "Test09966"})
         self.assertEquals(instance6.status_code, 302)
         self.assertEquals(instance7.status_code, 302)
         self.assertEquals(instance8.status_code, 400)
 
     def test_logout(self):
-        instance9 = self.client.get('/logout/')
+        instance9 = self.client.get(reverse('logout'))
         self.assertEquals(instance9.status_code, 302)
+
+    def test_checkout(self):
+        instance10 = self.client.get(reverse('checkout'))
+        self.assertIn('products', instance10.context)
+        self.assertIn('user', instance10.context)
+        self.assertIn('profile', instance10.context)
+        self.assertEquals(instance10.status_code, 200)

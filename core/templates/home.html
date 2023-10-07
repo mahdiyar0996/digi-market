@@ -12,7 +12,7 @@
   <div class="carousel-inner">
       {% for image in header %}
     <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
-      <img src="{{ request.build_absolute_uri }}{{image.image.url}}" class="d-block img-fluid" alt="..." >
+      <img src="{{ image }}" class="d-block img-fluid" alt="..." >
     </div>
       {% endfor %}
   </div>
@@ -31,9 +31,9 @@
     <h2 class="text-center mt-4">دسته بندی های دیجی مارکت</h2>
     <div class="row flex-row text-center mt-3 g-2">
         {% for field in category %}
-        <a href="{% url 'subcategory' field.name %}" class="col-4 col-lg-2 col-md-3 text-decoration-none">
-            <img src="{{ field.avatar.url }}" alt="" width="90px" height="90px">
-            <p>{{ field.name }}</p>
+        <a href="{% url 'subcategory' field.category_name %}" class="col-4 col-lg-2 col-md-3 text-decoration-none">
+            <img src="{{ field.category_avatar }}" alt="" width="90px" height="90px">
+            <p>{{ field.category_name }}</p>
         </a>
 
         {% endfor %}
@@ -44,7 +44,7 @@
     <div class="row flex-row text-center px-3 pb-3">
         {% for field in subcategory %}
         <a href="{% url 'product-list' field.name %}" class="col-4 col-sm-3 col-lg-2 text-center mt-4 border border-1 border-opacity-100 text-decoration-none">
-            <img src="{{ field.avatar.url }}" alt="" width="90" height="90" class="mt-2">
+            <img src="{{ field.avatar }}" alt="" width="90" height="90" class="mt-2">
             <p>{{ field.name }}</p>
         </a>
         {% endfor %}
