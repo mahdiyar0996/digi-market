@@ -35,6 +35,7 @@ class UserManager(BaseUserManager):
         user.save()
         Profile.objects.create(user=user, first_name=username)
         return user
+
     def create_user(self, username, email, password,
                     is_superuser=False, is_staff=False, is_active=True, **kwargs):
         return self._create_user(username, email, password, is_superuser=is_superuser,

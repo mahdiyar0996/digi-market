@@ -15,12 +15,25 @@ from utils.tools import get_average, get_avg, get_count
 from django.core.exceptions import BadRequest
 from django.db import IntegrityError
 from sys import getsizeof
+from main.settings import cache
+from django.core.cache import cache as django_cache
+
+
 class CategoryListView(View):
     @debugger
     def get(self, request, category):
-        subcategory = SubCategory.objects.filter(category__name=category)
-        header = Header.objects.filter(name=category)
-        return render(request, 'category-list.html', {'subcategory': subcategory, 'header': header})
+        user = cache.hgetall(f'user{request.session.get("sessionid")}')
+        products = cache.hgetall(f'list_of_subcategories_products{category}')
+        subcategory = django_cache.get(f'list_of_subcategories{category}')
+        if not products and subcategory:
+            subcategory, products = Product.filter_subcategories_and_products(request, category)
+        header = cache.lrange(f'header_{category}', 0, -1)
+        if header is None:
+            header = Header.filter_with_absolute_urls(request, category)
+        return render(request, 'category-list.html', {'subcategory': subcategory,
+                                                      'products': products,
+                                                      'header': header,
+                                                      'user': user})
 
 
 class ProductListView(View):

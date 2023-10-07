@@ -38,13 +38,12 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImageAdmin,]
 
     def save_model(self, request, obj, form, change):
-        try:
-            ProductImage.objects.get_or_create(product=obj, images=obj.avatar)
-        except ProductImage.MultipleObjectsReturned:
-            pass
-        # if obj.colour:
-        #     obj.colour = json.dumps(obj.colour.split(','))
         super().save_model(request, obj, form, change)
+        try:
+            ProductImage.objects.get(product=obj)
+        except (ProductImage.DoesNotExist, ValueError):
+            ProductImage.objects.create(product=obj, images=obj.avatar)
+            pass
 
 @admin.register(ProductComment)
 class ProductCommentAdmin(admin.ModelAdmin):

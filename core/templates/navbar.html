@@ -7,23 +7,23 @@
         </button>
         <a class="navbar-brand col-9 col-md-10 col-lg-2 text-center" href="{% url 'home' %}">دیجی مارکت</a>
         <div class="collapse navbar-collapse grid justify-content-center align-items-center" id="navbarSupportedContent">
-        <form class="d-flex mt-2 mt-lg-0 col-md-6 justify-content-center align-items-center" role="search" method="GET" action="">
-            <input class="form-control me-2" type="search" placeholder="جستجو" aria-label="Search">
+        <form class="d-flex mt-2 mt-lg-0 col-md-5 justify-content-center align-items-center" role="search" method="GET" action="">
+            <input class="form-control " type="search" placeholder="جستجو" aria-label="Search">
             <button class="btn btn-outline-success d-none" type="submit">جستجو</button>
       </form>
             <ul class="navbar-nav mb-2 mb-lg-0 col-md-3">
                 <li class="nav-item mx-1">
-                    <a class="nav-link " aria-current="page" href="{% url 'home' %}">صفحه اصلی</a>
+                    <a class="nav-link " aria-current="page" href="{% url 'home' %}" style="width: 100px">صفحه اصلی</a>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link " href="#">سوالی دارید</a>
+                    <a class="nav-link " href="#" style="width: 100px">سوالی دارید</a>
                 </li>
                 {% if not user%}
                 <li class="nav-item mx-1">
-                    <a class="nav-link mx-2" href="{% url 'login' %}">ورود</a>
+                    <a class="nav-link " href="{% url 'login' %}">ورود</a>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link " href="{% url 'register' %}">ثبت نام</a>
+                    <a class="nav-link" href="{% url 'register' %}" style="width: 80px">ثبت نام</a>
                 </li>
                 {% endif %}
             </ul>

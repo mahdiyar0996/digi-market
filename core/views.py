@@ -20,7 +20,7 @@ class HomeView(View):
         category = django_cache.get('category')
         subcategory = django_cache.get('subcategory')
         if not any([subcategory is not None, category is not None]):
-            subcategory, category = SubCategory.get_subcategory_and_category(request)
+            subcategory, category = SubCategory.all_subcategory_and_category(request)
         return render(request, 'home.html', {'user': user,
                                              'category': category,
                                              'subcategory': subcategory,

@@ -1,8 +1,9 @@
+import json
 import string
 
 from django.db import models
 from .managers import ProductManager
-from django.db.models import Sum, Count, F
+from django.db.models import Sum, Count, F, Avg
 from main.settings import cache
 from django.core.cache import cache as django_cache
 
@@ -39,7 +40,7 @@ class SubCategory(BaseAbstract):
         verbose_name_plural = 'sub_categories'
 
     @classmethod
-    def get_subcategory_and_category(cls, request):
+    def all_subcategory_and_category(cls, request):
         subcategory = cls.objects.select_related('category').annotate(category_name=F('category__name'),
                                                                               category_avatar=F('category__avatar')).\
                                                                                 values('category_name',
@@ -70,7 +71,7 @@ class Product(BaseAbstract):
     warranty = models.CharField("گارانتی", max_length=255, blank=True)
     tag = models.CharField(max_length=55, blank=True, db_index=True)
     price = models.BigIntegerField("قیمت",)
-    discount = models.IntegerField('تخفیف', blank=True)
+    discount = models.IntegerField('تخفیف', blank=True, default=0)
     is_active = models.BooleanField('وضعیت', default=True, db_index=True)
     colour = models.CharField("رنگ", max_length=55, blank=True,)
     stock = models.BigIntegerField("تعداد کالا", blank=True, null=True)
@@ -96,6 +97,41 @@ class Product(BaseAbstract):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def filter_subcategories_and_products(cls, request, category_name):
+        products = cls.objects.select_related('category', 'category__category').annotate(
+            category_subcategory_name=F('category__category__name'),
+            category_name=F('category__name'),
+            category_avatar=F('category__avatar'),
+        ).values('category_subcategory_name', 'category_name', 'category_avatar', 'category_id', 'id', 'name',
+                 'avatar', 'price', 'discount', 'stock').filter(category__category__name=category_name)
+        subcategory = set()
+        new_products = []
+        for index, item in enumerate(products):
+            subcategory_data = (
+                ('category_subcategory_name', item['category_subcategory_name']),
+                ('category_id', item['category_id']),
+                ('category_name', item['category_name']),
+                ('category_avatar', request.build_absolute_uri("/media/" + item['category_avatar']))
+            )
+            subcategory.add(subcategory_data)
+            product_data = {
+                'id': item['id'],
+                'name': item['name'],
+                'avatar': request.build_absolute_uri("/media/" + item['avatar']),
+                'price': item['price'],
+                'discount': item['discount'],
+                'stock': item['stock']
+                 },
+            new_products.append(product_data)
+        new_subcategory = []
+        for index, item in enumerate(subcategory):
+            data = dict(item)
+            new_subcategory.append(data)
+        django_cache.set(f'list_of_subcategories_products{category_name}', new_products, 60 * 10)
+        django_cache.set(f'list_of_subcategories{category_name}', new_subcategory, 60 * 10)
+        return new_subcategory, products
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,verbose_name='کالا', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
@@ -105,6 +141,7 @@ class ProductImage(models.Model):
         db_table = 'products_images'
         verbose_name = 'product_image'
         verbose_name_plural = 'products_images'
+
     def __str__(self):
         return self.product.name
 
@@ -137,3 +174,4 @@ class ProductComment(BaseAbstract):
     @staticmethod
     def is_active_comments(product_id):
         return ProductComment.objects.select_related('user').filter(product__id=product_id)
+
