@@ -19,6 +19,7 @@ from django.core.cache import cache as django_cache
 
 
 class RegisterView(View):
+    @debugger
     def get(self, request):
         form = RegisterForm()
         context = {'form': form}
@@ -52,6 +53,7 @@ class RegisterView(View):
 
 
 class RegisterCompleteView(View):
+    @debugger
     def get(self, request, uidb64, token):
         try:
             uid = urlsafe_base64_decode(uidb64)
@@ -70,10 +72,11 @@ class RegisterCompleteView(View):
 class LoginView(View):
     @debugger
     def get(self, request):
+        user = cache.hgetall(f'user{request.session.get("sessionid", False)}')
         form = LoginForm()
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'login.html', {'form': form, 'user': user})
 
-    @debugger
+
     def post(self, request):
         form = LoginForm(request.POST, initial=request.POST)
         if form.is_valid():
@@ -162,9 +165,11 @@ class ProfileView(View):
     @debugger
     def get(self, request):
         user = cache.hgetall(f'user{request.session["sessionid"]}')
+        print(user)
         profile = cache.hgetall(f'profile{request.session["sessionid"]}')
-        if not any([len(user) > 0, len(profile) > 0]):
-            user, profile = Profile().get_user_and_profile(request, request.user)
+
+        if any([len(user) < 1, len(profile) < 1]):
+            user, profile = Profile.get_user_and_profile(request, request.user)
         return render(request, 'profile.html', {'user': user, 'profile': profile})
 
 
@@ -180,6 +185,7 @@ class ProfileChangeView(View):
         return render(request, 'personal_info.html', {'form': form,
                                                       'profile': profile,
                                                       'user': user})
+
     def post(self, request):
         user = request.user
         form = UserForm(request.POST, initial=request.POST)
@@ -197,10 +203,10 @@ class ProfileBasketView(View):
     def get(self, request):
         user = cache.hgetall(f"user{request.session.get('sessionid', False)}")
         profile = cache.hgetall(f"profile{request.session.get('sessionid', False)}")
-        products = django_cache.get(f"user_basket{request.session.get('sessionid', False)}")
-        if user and products:
+        if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
-        if products:
+        products = django_cache.get(f"user_basket{request.session.get('sessionid', False)}")
+        if not products:
             products = products = UserBasket.filter_basket_products(request, request.user)
         return render(request, 'profile-basket.html', {'products': products, 'user': user, 'profile': profile})
 

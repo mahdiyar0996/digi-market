@@ -3,6 +3,7 @@
 {% block css %}
 {% load i18n %}
 {% load socialaccount %}
+{% load cache %}
 {% endblock %}
 
 {% block content %}
@@ -14,7 +15,9 @@
         <a href="{% url 'register' %}" class="text-info">ثبت نام</a>
     </div>
     <div class="row justify-content-start my-4" style=" margin-right: 50px; width: 200px">
+    {% cache 120 provider %}
     {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+    {% endcache %}
     </div>
 {% csrf_token %}
     <label for="" class="d-block mb-4">نام کاربری</label>

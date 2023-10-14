@@ -15,17 +15,17 @@
 {% block content %}
 <div class="row flex-md-row mx-2 justify-content-center justify-content-md-start">
     <ul class="text-decoration-none">
-    <a class="text-muted text-decoration-none" href="{% url 'subcategory' product.category.category.name %}">{{ product.category.category.name }}</a> /
-        <a class="text-muted text-decoration-none" href="{% url 'product-list' product.category.name %}">{{ product.category.name }}</a> /
-        <a class="text-muted text-decoration-none">{{ product.tag }}</a>
+    <a class="text-muted text-decoration-none" href="{% url 'category-list' product.category.category.category.name %}">{{ product.category.category.name }}</a> /
+        <a class="text-muted text-decoration-none" href="{% url 'subcategory-list' product.category.category.name %}">{{ product.category.category.name }}</a> /
+        <a class="text-muted text-decoration-none">{{ product.category.name }}</a>
     </ul>
     <div class="col-3 justify-content-center justify-content-md-start" id="product-image" style="height: 500px">
         <div id="carouselExampleAutoplaying" style="height: 100%" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner h-100">
               {% for image in product_images %}
-            <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %} h-100">
-              <img src="{{image.images.url}}" class="d-block img-fluid h-100"  alt="..." >
-            </div>
+                <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %} h-100">
+                  <img src="{{image.images}}" class="d-block img-fluid h-100"  alt="..." >
+                </div>
               {% endfor %}
             </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
@@ -33,7 +33,7 @@
                 <span class="visually-hidden">Previous</span>
             </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-                <span class="carousel-control-next-icon" ></span>
+                <span class="carousel-control-next-icon"></span>
                 <span class="visually-hidden">Next</span>
             </button>
         </div>

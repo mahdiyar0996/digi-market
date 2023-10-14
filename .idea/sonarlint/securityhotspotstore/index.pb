@@ -106,3 +106,15 @@ S
 #users/templates/profile-basket.html,1/6/1689d37c55c4b14db418a8d76afadc2aa00a5ed9
 @
 core/__init__.py,c/e/ce4f796c5be8947b7ba7705fab2b891600f264e5
+=
+users/apps.py,5/4/547f374cbbeef99e636bc50f0d5b5ba07651acb5
+@
+users/signals.py,a/0/a0e0150836975a196d6c9d23ebabbcfa31d724e1
+=
+utils/junk.py,a/f/af68bc487c7030966e87bda11686af764e67a116
+\
+,products/templates/sub-subcategory-list.html,d/d/dd9c99bebaacd22f37f26097364d2174a063ab16
+X
+(products/templates/subcategory-list.html,f/2/f223e195d9766936a5dd052d37696d84d0222d72
+C
+products/signals.py,9/8/98b89ce851a07408f84a620fba5b5066c4e73909

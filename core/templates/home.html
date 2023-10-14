@@ -3,7 +3,14 @@
     دیجی مارکت
 {% endblock %}
 {% block css %}
-
+<style>
+    @media only screen and (max-width: 500px) {
+    #sub-category-img {
+        width: 100%;
+        {#height: 100%;#}
+                    }
+                    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -31,9 +38,9 @@
     <h2 class="text-center mt-4">دسته بندی های دیجی مارکت</h2>
     <div class="row flex-row text-center mt-3 g-2">
         {% for field in category %}
-        <a href="{% url 'subcategory' field.category_name %}" class="col-4 col-lg-2 col-md-3 text-decoration-none">
-            <img src="{{ field.category_avatar }}" alt="" width="90px" height="90px">
-            <p>{{ field.category_name }}</p>
+        <a href="{% url 'category-list' field.name %}" class="col-4 col-lg-2 col-md-3 text-decoration-none">
+            <img src="{{ field.avatar }}" alt="" width="90px" height="90px">
+            <p>{{ field.name }}</p>
         </a>
 
         {% endfor %}
@@ -43,8 +50,8 @@
     <h2 class="text-center mt-4">پیشنهاد دیجی مارکت</h2>
     <div class="row flex-row text-center px-3 pb-3">
         {% for field in subcategory %}
-        <a href="{% url 'product-list' field.name %}" class="col-4 col-sm-3 col-lg-2 text-center mt-4 border border-1 border-opacity-100 text-decoration-none">
-            <img src="{{ field.avatar }}" alt="" width="90" height="90" class="mt-2">
+        <a href="{% url 'subcategory-list' field.name %}" class="col-4 col-sm-3 col-lg-2 text-center mt-4 border border-1 border-opacity-100 text-decoration-none">
+            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="90" height="90" class="mt-2">
             <p>{{ field.name }}</p>
         </a>
         {% endfor %}

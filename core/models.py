@@ -22,6 +22,6 @@ class Header(models.Model):
             header[item] = request.build_absolute_uri("/media/" + ''.join(header[item]))
             pipeline.lpush(f'header_{name}', header[item])
         pipeline.ltrim(f'header_{name}', 0, len(header))
-        pipeline.expire(f'header{name}', 60 * 10)
+        pipeline.expire(f'header{name}', 3 * 60)
         pipeline.execute()
         return header

@@ -9,9 +9,9 @@
 <form class="container-lg mt-5 bg-dark-subtle pt-4 " action="" method="POST" style="height: 100%;">
     <img src="/media/site_images/logo%20image.jpg" class="float-end d-none d-lg-block" style="height: 100%; width: 430px" alt="">
 <h2 class="text-center mb-4">ثبت نام</h2>
-<div class="mb-4" style="width: 200px">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-</div>
+{#<div class="mb-4" style="width: 200px">#}
+{#    {% include "socialaccount/snippets/provider_list.html" with process="login" %}#}
+{#</div>#}
 {% csrf_token %}
     {% if form.errors %}
       {% for error in form.non_field_errors %}

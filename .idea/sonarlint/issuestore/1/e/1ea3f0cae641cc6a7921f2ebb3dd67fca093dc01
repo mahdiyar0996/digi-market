@@ -1,2 +1,3 @@
 
-Bpython:S125-"Remove this commented out code.(æÏ²Áüÿÿÿÿ8’Ã‡¯1
+;python:S27723"Remove this unneeded "pass".(ã‘Û¾8”ØÃö²1
+]python:S905=":Remove or refactor this statement; it has no side effects.(ÒÌâ–øÿÿÿÿ8•ØÃö²1

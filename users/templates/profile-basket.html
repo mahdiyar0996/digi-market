@@ -79,31 +79,31 @@
         </div>
         <div class="col-12 col-md-9 card justify-content-center align-items-center mt-5 px-3">
             {% for product in products %}
-            <div class="my-3 row flex-column w-100">
+            <div class="my-3 row flex-column w-100 h-100">
                 <div class="row flex-row my-3 justify-content-between">
                     <div class=" col-3">
-                        <a href="{% url 'product-details' product.category_name product.products_id %}">
-                        <img src="{{ product.products_avatar }}" id="product-image">
+                        <a href="{% url 'product-details' product.product__category__name product.product__id %}">
+                        <img src="{{ product.product__avatar }}" id="product-image">
                         </a>
                     </div>
                 <div class="col-7 col-sm-5 col-md-5 col-lg-6 flex-column">
-                    <p>{{ product.products_name }}</p>
-                    {% for key,value in product.products_details.items %}
+                    <p>{{ product.product__name }}</p>
+                    {% for key,value in product.product__details.items %}
                     <p style="font-size: 14px">
                             {{ key }} : {{ value }}
                     </p>
                     {% endfor %}
-                    {% if product.products_stock > 10 %}
+                    {% if product.product__stock > 10 %}
                     <div class="my-2 text-success">موجود در انبار</div>
-                    {% elif product.products_stock < 10%}
-                    <div class="text-danger my-2">تنها{{ product.products_stock }}کالا باقی مانده</div>
+                    {% elif product.product__stock < 10%}
+                    <div class="text-danger my-2">تنها{{ product.product__stock }}کالا باقی مانده</div>
                     {% endif %}
                 </div>
                 <div class="col-12  col-md-4 col-lg-3">
                     <form class="card justify-content-start align-items-center" method="POST" action="">
                         <p class="card-title mt-2">دیجی مارکت<img src="/media/site_images/logo%20image.jpg" width="16" height="16"></p>
-                        <p>گارانتی : <span class="text-muted">{{ product.products_warranty }}</span></p>
-                        <p class="text-end">تومان{{ product.products_price }}</p>
+                        <p>گارانتی : <span class="text-muted">{{ product.product__warranty }}</span></p>
+                        <p class="text-end">تومان{{ product.product__price }}</p>
                         <button class="btn btn-danger mb-3" type="submit" name="submit-order">ثبت سفارش</button>
                     </form>
                 </div>

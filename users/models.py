@@ -33,7 +33,6 @@ class UserManager(BaseUserManager):
         user.is_active = is_active
         user.set_password(password)
         user.save()
-        Profile.objects.create(user=user, first_name=username)
         return user
 
     def create_user(self, username, email, password,
@@ -49,7 +48,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
-    username = models.CharField('نام کاربری', max_length=55, unique=True,null=True, validators=[valid_username()],
+    username = models.CharField('نام کاربری', max_length=55, unique=True, validators=[valid_username()],
                                 error_messages={'unique': 'کاربری با این نام وجود دارد',
                                                 'invalid': 'نام کاربری باید از حروف,اعداد و ـ باشد'})
     email = models.EmailField('ایمیل' ,max_length=128, unique=True,null=True,
@@ -63,7 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
     credits = models.BigIntegerField('موجودی', null=True, blank=True)
     password = models.CharField('رمز عبور', max_length=255,
                                 error_messages={'invalid': 'رمز کاربری باید ۸ کاراکتر یا بیشتر باشد و یک حرف بزرگ داشته باشد'})
-    city = models.CharField('شهر', max_length=55, blank=True, null=True, db_index=True)
+    city = models.CharField('شهر', max_length=55, blank=True, null=True,  db_index=True)
     address = models.TextField('ادرس', max_length=555, blank=True, null=True)
     is_superuser = models.BooleanField('ادمین', default=False, db_index=True)
     is_staff = models.BooleanField('کارکنان', default=False, db_index=True)
@@ -108,11 +107,11 @@ class Profile(models.Model):
     user = models.OneToOneField(User, primary_key=True, related_name='%(class)s', blank=True, on_delete=models.CASCADE)
     avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='users/profile/',
                                default='users/profile/default.jpg')
-    first_name = models.CharField('نام', max_length=55, null=True, blank=True)
+    first_name = models.CharField('نام', max_length=55, blank=True, null=True)
     last_name = models.CharField('نام خانوادگی', max_length=55, blank=True, null=True)
     age = models.SmallIntegerField('تاریخ تولد', blank=True, null=True)
-    job = models.CharField('شغل', blank=True, null=True, max_length=55)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    job = models.CharField('شغل', blank=True, max_length=55, null=True)
+    updated_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         db_table = 'users-profiles'
@@ -142,7 +141,13 @@ class Profile(models.Model):
                                                               'user__credits', 'user__city', 'user__address',
                                                               'user__address').get(user=user)
         profile['avatar'] = request.build_absolute_uri("/media/" + profile['avatar'])
-        user_data = {key.replace('user__', ''): value for key, value in profile.items() if 'user' in key}
+        # user_data = {key.replace('user__', ''): value for key, value in profile.items() if 'user' in key}
+        profile_copy = profile.copy()
+        user_data = {}
+        for key, value in profile_copy.items():
+            if 'user' in key:
+                user_data[key.replace('user__', '')] = value
+                profile.pop(key)
         with cache.pipeline() as pipeline:
             pipeline.hset(f'user{user.id}', mapping=user_data)
             pipeline.expire(f"user{user.id}", 7200)
@@ -166,23 +171,22 @@ class UserBasket(models.Model):
     @classmethod
     def filter_basket_products(cls, request, user: User):
         products = cls.objects.select_related('product', 'profile', 'profile__user').\
-            annotate(category_name=F('product__category__name'),
-                     products_avatar=F('product__avatar'), products_id=F('product__id'),
-                     products_details=F('product__details'),
-                     products_stock=F('product__stock'),
-                     products_price=F('product__price'),
-                     products_warranty=F('product__warranty')).\
-            values('category_name', 'products_avatar', 'products_details',
-                   'products_stock', 'products_price', 'products_warranty',
-                   'products_id').\
+            values('product__category__name', 'product__avatar', 'product__name', 'product__details',
+                   'product__stock', 'product__price', 'product__warranty', 'count',
+                   'product__id').\
             filter(profile__user=user)
         # pipeline = cache.pipeline()
         for item in products:
-            item['products_avatar'] = request.build_absolute_uri("/media/" + item['products_avatar'])
-            item['products_price'] = "{:,}".format(item['products_price'])
-
-        django_cache.set(f'user_basket{user.id}', products, 7200)
-        # pipeline.set(f'user_basket{user.id}', json.dumps(list(products)))
+            item['product__avatar'] = request.build_absolute_uri("/media/" + item['product__avatar'])
+            item['product__price'] = "{:,}".format(item['product__price'])
+        django_cache.set(f'user_basket{user.id}', products, 60)
+        # pipeline.hset(f'user_basket{user.id}', mapping=item)
         # pipeline.expire(f'user_basket{user.id}', 7200)
         # pipeline.execute()
+        return products
+
+    @classmethod
+    def get_basket_product_counts(cls, user, product_id):
+        products = cls.objects.select_related('product',). \
+            values('count').get(profile__user__username=user, product__id=product_id)
         return products

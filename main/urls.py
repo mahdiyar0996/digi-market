@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),  #oauth urls
     path('captcha/', include('captcha.urls')),   #captcha urls
+    path("__debug__/", include("debug_toolbar.urls")), #django toolbar urls
     path('', include('users.urls')),
     path('', include('core.urls')),
     path('', include('products.urls')),
