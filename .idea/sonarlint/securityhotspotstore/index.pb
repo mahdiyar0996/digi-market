@@ -71,8 +71,6 @@ U
 %products/templates/category-list.html,8/4/84c53624ddf6c6b0f48a993f55bf82415188bad6
 A
 products/views.py,e/7/e7c0df80dbe407ceab2293cb3ce846b3cc0b1733
-T
-$products/templates/product-list.html,7/5/75329d85288453b8733599648bd04215a52f3dcd
 G
 users/static/reboot.css,f/e/fefcf23b2c70ae70241e32ac3c586f44c8901eb7
 S
