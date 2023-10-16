@@ -48,12 +48,50 @@
 </div>
 <div class="card mx-4 mt-4 border rounded-4">
     <h2 class="text-center mt-4">پیشنهاد دیجی مارکت</h2>
-    <div class="row flex-row text-center px-3 pb-3">
+    <div class="row flex-row text-center px-3 pb-3 g-1 mt-4">
         {% for field in subcategory %}
-        <a href="{% url 'subcategory-list' field.name %}" class="col-4 col-sm-3 col-lg-2 text-center mt-4 border border-1 border-opacity-100 text-decoration-none">
-            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="90" height="90" class="mt-2">
+        <a href="{% url 'subcategory-list' field.name %}" class="col-4 col-sm-3 col-lg-2 border border-opacity-50 mt-0 text-decoration-none">
+            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="90" height="90" class="">
             <p>{{ field.name }}</p>
         </a>
+        {% endfor %}
+    </div>
+</div>
+<div class="card mx-4 mt-4 border rounded-4">
+    <h4 class="text-center mt-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-percent text-danger" viewBox="0 0 16 16">
+  <path d="M13.442 2.558a.625.625 0 0 1 0 .884l-10 10a.625.625 0 1 1-.884-.884l10-10a.625.625 0 0 1 .884 0zM4.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm7 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+</svg>منتخب محصولات تخفیف و حراج</h4>
+    <div class="row flex-row text-center g-1 mt-4 mx-0 w-100 gx-0 gap-0">
+        {% for field in products %}
+        <a href="{% url 'product-details' field.category__name field.id %}" class="col-6 col-sm-4 col-md-3 col-lg-2 border border-bottom-0 border-opacity-50 mt-0 text-decoration-none align-items-">
+            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="150" height="150" class="">
+            <div class="d-flex flex-row justify-content-between mt-4">
+            <span style="height: 24px" class=" {% if field.discount == 0 %}invisible{% endif %} bg-danger">{{ field.discount }}%</span>
+            <div class="{% if field.discount != 0 %} text-light-emphasis{% endif %}">
+                {% if field.discount == 0 %}{{ field.price }} تومان{% else %}{{ field.discounted_price }} تومان{% endif %}</div>
+            </div>
+            {% if field.discount != 0 %}
+            <div class="text-end me-4 mt-2 text-decoration-line-through text-muted">{{ field.price }}</div>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+<div class="card mx-4 mt-2">
+    <div class="row w-100 mx-0">
+        {% for category in sub_sub_categories %}
+            <div class="col-lg-3 col-6 border border-bottom-0 border-top-0 g-0 gap-0 w-1">
+                <div class="ms-3 mt-2">{{ category.name }}</div>
+                <div class="ms-3 mt-2" style="font-size: 12px">بر اساس بازدید های شما</div>
+                <div class="row w-100 gx-0">
+                {% for product in category.product.all|slice:4 %}
+                    <a href="{% url 'product-details' category.name product.id %}"  class="col-6 border {% cycle 'border-start-0' 'border-end-0' 'border-start-0' 'border-end-0' %}
+                            border-top-0">
+                        <img src="{{ request.build_absolute_uri }}media/{{ product.avatar }}" alt="" class="img-fluid" height="119">
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
         {% endfor %}
     </div>
 </div>

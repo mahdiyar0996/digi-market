@@ -72,7 +72,7 @@ class RegisterCompleteView(View):
 class LoginView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f'user{request.session.get("sessionid", False)}')
+        user = cache.hgetall(f'user{request.COOKIES.get("sessionid", False)}')
         form = LoginForm()
         return render(request, 'login.html', {'form': form, 'user': user})
 
@@ -90,12 +90,15 @@ class LoginView(View):
             if user is not None:
                 user.ipaddress = request.META.get('REMOTE_ADDR')
                 user.save()
-                request.session['sessionid'] = user.id
+                response = redirect('profile')
+                # request.session['sessionid'] = user.id
                 if remember is True:
-                    request.session.set_expiry(0)
-                request.session.set_expiry(60 * 60 * 24)
+                    response.set_cookie('user_id', user.id, 60 * 60 * 24 * 7)
+                    # request.session.set_expiry(0)
+                response.set_cookie('user_id', user.id)
+                # request.session.set_expiry(60 * 60 * 24)
                 login(request, user)
-                return redirect('profile')
+                return response
             return render(request, 'login.html', {'form': form}, status=400)
         messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
         return render(request, 'login.html', {'form': form}, status=400)
@@ -104,7 +107,9 @@ class LoginView(View):
 class Logout(View):
     def get(self, request):
         logout(request)
-        return redirect('home')
+        response = redirect('home')
+        response.delete_cookie('user_id')
+        return response
 
 
 class PasswordResetTokenView(View):
@@ -164,9 +169,9 @@ class PasswordResetCompleteView(View):
 class ProfileView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f'user{request.session["sessionid"]}')
+        user = cache.hgetall(f'user{request.COOKIES["sessionid"]}')
         print(user)
-        profile = cache.hgetall(f'profile{request.session["sessionid"]}')
+        profile = cache.hgetall(f'profile{request.COOKIES["sessionid"]}')
 
         if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
@@ -176,8 +181,8 @@ class ProfileView(View):
 class ProfileChangeView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f'user{request.session["sessionid"]}')
-        profile = cache.hgetall(f'profile{request.session["sessionid"]}')
+        user = cache.hgetall(f'user{request.COOKIES["sessionid"]}')
+        profile = cache.hgetall(f'profile{request.COOKIES["sessionid"]}')
         if not any([len(user) > 0, len(profile) > 0]):
             user, profile = Profile.get_user_and_profile(request, request.user)
         data = user | profile
@@ -201,11 +206,11 @@ class ProfileChangeView(View):
 class ProfileBasketView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f"user{request.session.get('sessionid', False)}")
-        profile = cache.hgetall(f"profile{request.session.get('sessionid', False)}")
+        user = cache.hgetall(f"user{request.COOKIES.get('sessionid', False)}")
+        profile = cache.hgetall(f"profile{request.COOKIES.get('sessionid', False)}")
         if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
-        products = django_cache.get(f"user_basket{request.session.get('sessionid', False)}")
+        products = django_cache.get(f"user_basket{request.COOKIES.get('sessionid', False)}")
         if not products:
             products = products = UserBasket.filter_basket_products(request, request.user)
         return render(request, 'profile-basket.html', {'products': products, 'user': user, 'profile': profile})

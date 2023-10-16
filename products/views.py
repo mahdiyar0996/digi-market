@@ -23,7 +23,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 class CategoryListView(View):
     @debugger
     def get(self, request, category):
-        user = cache.hgetall(f'user{request.session.get("sessionid")}')
+        user = cache.hgetall(f'user{request.COOKIES.get("sessionid")}')
         subcategory = django_cache.get(f'list_of_subcategories{category}')
         if subcategory is None:
             subcategory = SubCategory.filter_subcategory_with_category(request, category)
@@ -46,7 +46,7 @@ class CategoryListView(View):
 class SubCategoryListView(View):
     @debugger
     def get(self, request, category):
-        user = cache.hgetall(f'user{request.session.get("sessionid", False)}')
+        user = cache.hgetall(f'user{request.COOKIES.get("sessionid", False)}')
         products = django_cache.get(f'products_{category}')
         sub_sub_categories = django_cache.get(f'sub_sub_categories{category}')
         if not products:
@@ -99,7 +99,7 @@ class ProductDetailsView(View):
     @debugger
     def get(self, request, category, product_id,):
         form = ProductCommentForm
-        user = cache.hgetall(f'user{request.session.get("sessionid", False)}')
+        user = cache.hgetall(f'user{request.COOKIES.get("sessionid", False)}')
         product = django_cache.get(f'product:{product_id}')
         product_images = django_cache.get(f'images:{product_id}')
         if not any([product, product_images]):
@@ -128,6 +128,7 @@ class ProductDetailsView(View):
                                                         'average': average,
                                                         'is_in_basket': is_in_basket,
                                                         'user': user})
+
     @debugger
     def post(self, request, category, product_id):
         try:
@@ -137,11 +138,15 @@ class ProductDetailsView(View):
         except UserBasket.DoesNotExist:
             pass
         if request.POST.get('add-to-basket', False):
-            try:
-                product = Product.objects.get(id=product_id)
-                UserBasket.objects.create(profile=request.user.profile, product=product)
-            except IntegrityError:
-                pass
+            if request.user:
+                try:
+                    product = Product.objects.get(id=product_id)
+                    UserBasket.objects.create(profile=request.user.profile, product=product)
+                except IntegrityError:
+                    pass
+            else:
+                messages.error(request, 'ابتدا وارد حساب خود شوید', 'login')
+                print('dsfsd')
         if request.POST.get('add-more', False):
             try:
                 add_more_to_basket = UserBasket.objects.get(profile=request.user.profile, product__id=product_id)

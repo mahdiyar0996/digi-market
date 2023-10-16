@@ -3,12 +3,53 @@
     لیست محصولات
 {% endblock %}
 {% block css %}
+    <style>
+    @media only screen and (min-width: 990px) {
+    #filter {
+        display: block;
+        width: 100%;
+        {#height: 100%;#}
+                    }
+        }
+    @media only screen and (min-width: 1008px) {
+    #filter {
+        width: 50%;
+                    }
+        }
+    @media only screen and (max-width: 576px) {
+        #product-img {
+            max-width: 220px;min-width: 150px;
+                        }
+            }
+
+    @media only screen and (min-width: 576px) {
+        #product-img {
+            width: 100%;
+                        }
+            }
+    @media only screen and (max-width: 990px) {
+        #min_price {
+            width: 75%;
+                        }
+            }
+    @media only screen and (max-width: 990px) {
+        #max_price {
+            width: 75%;
+                        }
+            }
+    </style>
 {% endblock %}
 {% block content %}
-<div class="row mt-1 jus">
-    <div class="card col-3 flex-column position-sticky mt-0 " style="height: max-content">
-        <h4 class="card-title text-center mt-2">فیلتر ها</h4>
-        <form onsubmit="validate()" class="ms-2" action="" method="GET">
+<div class="row flex-lg-row flex-column mt-1">
+    <div class="card col-lg-3 col-12  flex-column position-sticky mt-0 " style="height: max-content">
+        <h4 class="card-title text-center d-none d-lg-block mt-2">فیلتر</h4>
+        <a style="" class="d-block d-lg-none my-3 ms-3 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#filter" href="#filter" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+            </svg>
+            فیلتر
+            </a>
+        <form onsubmit="validate()" class="ms-2 collapse w-100" action="" method="GET" id="filter">
             <a style="height: 57px" class="text-start d-block fs-5 pt-3 text-decoration-none border border-start-0 border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#categories" href="#categories" role="button" aria-expanded="false" aria-controls="collapseExample">
             دسته بندی ها
             </a>
@@ -66,14 +107,14 @@
             </div>
         </form>
     </div>
-    <div class="col-9 d-flex flex-row mt-0" style="height: 100vh; justify-self: end">
+    <div class="col-12 col-lg-9 d-flex flex-row mt-0" style="height: 100vh; justify-self: end">
         <div class="row justify-content-lg-start" style="width: 100%">
         {% for field in products %}
-         <a href="{% url 'product-details' field.category__name field.id %}" class="col-6 col-md-4 d-flex col-sm-2 flex-column justify-content-center align-items-center p-3 text-center text-decoration-none border" style="max-width: 337px;min-width: 250px; height: 400px" id="product-box">
-            <img src="{{ field.avatar }}" alt="" width="220" height="200">
-            <p class="d-block" style="height: 80px">{{ field.name }}</p>
+         <a href="{% url 'product-details' field.category__name field.id %}" class="d-block d-sm-flex col-12 col-sm-6 col-lg-3 d-flex  flex-column justify-content-center align-items-center text-center text-decoration-none border ps-5 ps-sm-2 p-3 " style="height: 400px" id="product-box">
+            <img src="{{ field.avatar }}" alt="" class="w-75" height="200" id="product-img">
+            <p class="d-block " style="height: 80px" >{{ field.name|truncatewords:9 }}</p>
             <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                <p class="d-block {% if field.stock < 10 %}text-danger{% endif %}" style="justify-self: start">تعداد در انبار{{ field.stock }}</p>
+                <p class="d-block {% if field.stock < 10 or field.stock == None %}text-danger{% endif %}" style="justify-self: start">{% if field.stock > 0 or field.stock != None%}تعداد در انبار{{ field.stock }}{% else %}ناموجود{% endif %}</p>
                 <p class="d-block" style="justify-self: end">{% if field.average > 0 %}{{ field.average|floatformat:1 }}{% else %}0{% endif %}
                     <svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill text-warning mb-1" viewBox="0 0 16 16">
                       <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
