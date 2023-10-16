@@ -15,9 +15,9 @@
 {% block content %}
 <div class="row flex-md-row mx-2 justify-content-center justify-content-md-start">
     <ul class="text-decoration-none">
-    <a class="text-muted text-decoration-none" href="{% url 'category-list' product.category.category.category.name %}">{{ product.category.category.name }}</a> /
+    <a class="text-muted text-decoration-none" href="{% url 'category-list' product.category.category.category.name %}">{{ product.category.category.category.name }}</a> /
         <a class="text-muted text-decoration-none" href="{% url 'subcategory-list' product.category.category.name %}">{{ product.category.category.name }}</a> /
-        <a class="text-muted text-decoration-none">{{ product.category.name }}</a>
+        <a class="text-muted text-decoration-none" href="{% url 'sub-subcategory-list' product.category.name %}">{{ product.category.name }}</a>
     </ul>
     <div class="col-3 justify-content-center justify-content-md-start" id="product-image" style="height: 500px">
         <div id="carouselExampleAutoplaying" style="height: 100%" class="carousel slide" data-bs-ride="carousel">
@@ -81,17 +81,17 @@
                     <div class="text-danger my-2">تنها{{ product.stock }}کالا باقی مانده</div>
                 {% endif %}
                 {% if not product.discount > 0 %}
-                <div class="text-end mb-4 mt-2">{{ product.split_price }}تومان</div>
+                <div class="text-end mb-4 mt-2 ">{{ product.split_price }}تومان</div>
                 {% else %}
                     <div class="d-flex justify-content-end">
                         <div class="me-5">
-                    <span class="text-end mb-4 mt-2 text-decoration-line-through  text-muted">
+                    <span class="text-end mb-4 mt-2">
                         {{ product.get_discount }}تومان
                     </span>
                     <span class="text-body bg-danger strong fw-light" style="height: 24px;width: 32px">{{ product.discount }}%</span>
                         </div>
                     </div>
-                    <div class="text-end mb-4 mt-2 ">{{ product.split_price }}تومان</div>
+                    <div class="text-end mb-4 mt-2 text-decoration-line-through text-muted">{{ product.split_price }}تومان</div>
                 {% endif %}
                 {% if not is_in_basket %}
                 <button class="btn btn-danger text-center" type="submit" name="add-to-basket" value="{{ product.name }}">افزودن به سبد خرید</button>
@@ -225,3 +225,5 @@
     </div>
     <hr>
 {% endblock %}
+
+

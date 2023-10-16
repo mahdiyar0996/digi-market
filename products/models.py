@@ -89,8 +89,23 @@ class SubSubCategory(BaseAbstract):
         django_cache.set(f'sub_sub_categories{category_name}', sub_sub_category, 60 * 10)
         return sub_sub_category
 
+    @classmethod
+    def all_sub_categories_with_products(cls, request, categories):
+        if len(categories) > 0:
+            sub_sub_categories = cls.objects.prefetch_related('product').filter(name__in=categories)[:4][:4]
+        else:
+            sub_sub_categories = cls.objects.prefetch_related('product').all()[:4]
+        # for item in sub_sub_categories:
+        #     for product in item.product.all()[:4]:
+        #         product.avatar = request.build_absolute_uri("/media/" + product.avatar)
+        ipaddress = request.META.get('REMOTE_ADDR')
+        django_cache.set(f'user_recent_products{ipaddress}', sub_sub_categories, 60 * 10)
+        return sub_sub_categories
+
+
 class Product(BaseAbstract):
     category = models.ForeignKey(SubSubCategory, verbose_name='مجموعه', related_name='%(class)s', on_delete=models.DO_NOTHING)
+    brand = models.CharField("برند", max_length=55, blank=True, null=True)
     description = models.TextField("درباره کالا", max_length=1000, blank=True, null=True)
     details = models.JSONField("جزییات", blank=True, null=True)
     warranty = models.CharField("گارانتی", max_length=255, blank=True)
@@ -162,6 +177,20 @@ class Product(BaseAbstract):
         return products
 
 
+    @classmethod
+    def filter_product_with_most_discount(cls, request, discount, **kwargs):
+        category = kwargs.get('category__name')
+        if category == 'home':
+            del kwargs['category__name']
+        products = cls.objects.select_related('category').values('category__name',"id",'avatar', "name",
+                                                                     "price", 'discount').filter(**kwargs)[:18]
+        for item in products:
+            item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
+            item['discounted_price'] = "{:,}".format( item['price'] - (item['price'] * item['discount'] // 100))
+            item['price'] = '{:,}'.format(item['price'])
+        django_cache.set(f'discounted_products{category}', products, 60 * 10)
+        return products
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,verbose_name='کالا', related_name='%(class)s', on_delete=models.CASCADE, db_index=True)
     images = models.ImageField('عکس ها', upload_to='products/images/', blank=True)
@@ -179,7 +208,7 @@ class ProductImage(models.Model):
         images = cls.objects.select_related(
             'product', 'product__category',
             'product__category',
-            'product__category__category').filter(product_id=product_id)
+            'product__category__category','product__category__category__category').filter(product_id=product_id)
         print(images)
         product = images[0].product
         for item in images:
