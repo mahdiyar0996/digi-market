@@ -35,12 +35,14 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
 
 
 AUTH_USER_MODEL = 'users.User'
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
@@ -136,10 +138,9 @@ LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'home'
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    # 'users.backends.EmailUsernameAuthentication',
     # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
-
-
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
@@ -168,7 +169,7 @@ CACHES = {
             "SOCKET_CONNECT_TIMEOUT": 5,  # seconds  connection timeout
             "SOCKET_TIMEOUT": 5,  # seconds  #read and write timeout
             "IGNORE_EXCEPTIONS": True,     #when redis is down dont raise exception
-            "PICKLE_VERSION": -1,
+            "PICKLE_VERSION": -1  # Will use highest protocol version available
 
         }
     }

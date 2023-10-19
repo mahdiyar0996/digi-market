@@ -11,6 +11,7 @@ from .views import (RegisterView,
                     ProfileChangeView,
                     ProfileBasketView)
 urlpatterns = [
+    path('', include('users.api.urls')),
     path('register/', RegisterView.as_view(), name='register'),
     path('activate/<str:uidb64>/<str:token>/', RegisterCompleteView.as_view(), name='email-activate'),
     path('login/', LoginView.as_view(), name='login'),

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.contrib.auth.models import (BaseUserManager,
                                         AbstractBaseUser,
                                         PermissionsMixin,)
@@ -103,6 +103,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         super().save()
 
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, primary_key=True, related_name='%(class)s', blank=True, on_delete=models.CASCADE)
     avatar = models.ImageField('اواتار', blank=True, null=True, upload_to='users/profile/',
@@ -139,9 +140,8 @@ class Profile(models.Model):
         profile = cls.objects.select_related('user').values('avatar', 'first_name', 'last_name', 'job', 'age',
                                                               'user__username', 'user__email', 'user__phone_number',
                                                               'user__credits', 'user__city', 'user__address',
-                                                              'user__address').get(user=user)
+                                                            ).get(user=user)
         profile['avatar'] = request.build_absolute_uri("/media/" + profile['avatar'])
-        # user_data = {key.replace('user__', ''): value for key, value in profile.items() if 'user' in key}
         profile_copy = profile.copy()
         user_data = {}
         for key, value in profile_copy.items():

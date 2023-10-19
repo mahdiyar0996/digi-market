@@ -2,22 +2,25 @@ from django.contrib.auth.hashers import check_password
 from django.db.models import Q
 from .models import User
 from django.contrib import messages
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import get_user_model
+UserModel = get_user_model()
+class EmailUsernameAuthentication(ModelBackend):
 
-class EmailUsernameAuthentication(object):
-    @staticmethod
-    def authenticate(request, email=None, username=None, password=None):
+    def authenticate(self, request, email=None, username=None, password=None):
+        if (username is None and password is None) or (email is None and password is None):
+            return None
         try:
             user = User.objects.get(Q(username__exact=username) |
                                     Q(email__exact=email)
                                     )
         except User.DoesNotExist:
             return None
-        if user.is_active == False:
+        if not user.is_active:
             messages.error(request, 'حساب شما فعال نمی باشد', 'danger')
             return None
         if user and check_password(password, user.password):
             return user
-
         return None
 
 

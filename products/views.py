@@ -23,7 +23,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 class CategoryListView(View):
     @debugger
     def get(self, request, category):
-        user = cache.hgetall(f'user{request.COOKIES.get("sessionid")}')
+        user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         subcategory = django_cache.get(f'list_of_subcategories{category}')
         if subcategory is None:
             subcategory = SubCategory.filter_subcategory_with_category(request, category)
@@ -46,7 +46,7 @@ class CategoryListView(View):
 class SubCategoryListView(View):
     @debugger
     def get(self, request, category):
-        user = cache.hgetall(f'user{request.COOKIES.get("sessionid", False)}')
+        user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         products = django_cache.get(f'products_{category}')
         sub_sub_categories = django_cache.get(f'sub_sub_categories{category}')
         if not products:
@@ -99,7 +99,7 @@ class ProductDetailsView(View):
     @debugger
     def get(self, request, category, product_id,):
         form = ProductCommentForm
-        user = cache.hgetall(f'user{request.COOKIES.get("sessionid", False)}')
+        user = cache.hgetall(f'user{request.session.get("_auth_user_id", False)}')
         product = django_cache.get(f'product:{product_id}')
         product_images = django_cache.get(f'images:{product_id}')
         if not any([product, product_images]):
@@ -117,17 +117,28 @@ class ProductDetailsView(View):
         else:
             average = 0
             comment_counts = 0
+            product_comments = None
         try:
             is_in_basket = UserBasket.get_basket_product_counts(user['username'], product_id)
         except (UserBasket.DoesNotExist, KeyError):
             is_in_basket = None
-        return render(request, 'product-details.html', {'product': product, 'product_images': product_images,
+        response = render(request, 'product-details.html', {'product': product, 'product_images': product_images,
                                                         'product_details': product_details,
                                                         'product_comments': product_comments,
                                                         'comment_counts': comment_counts, 'form': form,
                                                         'average': average,
                                                         'is_in_basket': is_in_basket,
                                                         'user': user})
+        recent_view = request.COOKIES.get('by-recent-views', False)
+        if recent_view:
+            if str(product.category.id) not in recent_view:
+                response.set_cookie('by-recent-views', recent_view + f' {product.category.id}')
+                if len(request.COOKIES.get('by-recent-views')) > 40:
+                    recent_view = request.COOKIES.get('by-recent-views').split(' ')
+                    del recent_view[0]
+        else:
+            response.set_cookie('by-recent-views', str(product.category.id))
+        return response
 
     @debugger
     def post(self, request, category, product_id):
@@ -138,14 +149,14 @@ class ProductDetailsView(View):
         except UserBasket.DoesNotExist:
             pass
         if request.POST.get('add-to-basket', False):
-            if request.user:
+            if request.user.is_authenticated:
                 try:
                     product = Product.objects.get(id=product_id)
                     UserBasket.objects.create(profile=request.user.profile, product=product)
                 except IntegrityError:
                     pass
             else:
-                messages.error(request, 'ابتدا وارد حساب خود شوید', 'login')
+                messages.error(request, 'ابتدا وارد حساب خود شوید', 'add-to-basket')
                 print('dsfsd')
         if request.POST.get('add-more', False):
             try:
@@ -160,10 +171,12 @@ class ProductDetailsView(View):
             if form.is_valid():
                 product_name = Product.objects.get(id__exact=product_id, category__name__exact=category)
                 cp = form.cleaned_data
-                ProductComment.objects.create(product=product_name, user=request.user,
-                                                        comment=cp['comment'], rating=cp['rating'])
-
-                messages.success(request, 'دیدگاه شما ارسال شد و بعد از تایید شدن قرار گرفته میشود', 'success')
+                try:
+                    ProductComment.objects.create(product=product_name, user=request.user,
+                                                            comment=cp['comment'], rating=cp['rating'])
+                    messages.success(request, 'دیدگاه شما ارسال شد و بعد از تایید شدن قرار گرفته میشود', 'comment')
+                except ValueError:
+                    messages.error(request, 'برای ارسال نظر باید وارد حساب خود شوید', 'comment')
                 return redirect('product-details', category, product_id)
             return HttpResponseBadRequest
         return redirect('product-details', category, product_id)
