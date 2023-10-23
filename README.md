@@ -9,4 +9,4 @@ this project uses these technologies
 + allauth
 + rest_framework
 + elastic search
-+ nginxs
++ nginx
