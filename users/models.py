@@ -13,9 +13,9 @@ cache = get_redis_connection('default')
 
 
 class AbstractBase(models.Model):
-    created_at = models.DateTimeField(auto_now=True, null=True)
-    updated_at = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField("زمان ساخت", auto_now=True, null=True)
+    updated_at = models.DateTimeField("زمان به روزرسانی", auto_now_add=True, null=True)
+    is_active = models.BooleanField("وضعیت", default=True)
     class Meta:
         abstract = True
 
@@ -43,8 +43,6 @@ class UserManager(BaseUserManager):
                          is_superuser=True, is_staff=True, is_active=True, **kwargs):
         return self._create_user(username, email, password, is_superuser=is_superuser,
                                  is_staff=is_staff, is_active=is_active, **kwargs)
-
-
 
 
 class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
@@ -101,7 +99,6 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
         self.city = kwargs.get('city', self.city)
         self.address = kwargs.get('address', self.address)
         super().save()
-
 
 
 class Profile(models.Model):

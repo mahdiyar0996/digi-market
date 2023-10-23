@@ -50,14 +50,14 @@
     <h2 class="text-center mt-4">پیشنهاد دیجی مارکت</h2>
     <div class="row flex-row text-center px-3 pb-3 g-1 mt-4">
         {% for field in subcategory %}
-        <a href="{% url 'subcategory-list' field.name %}" class="col-4 col-sm-3 col-lg-2 border border-opacity-50 mt-0 text-decoration-none">
+        <a href="{% url 'subcategory-list' field.name %}" class="col-4 col-sm-3 col-lg-2 mt-0 text-decoration-none">
             <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="90" height="90" class="">
             <p>{{ field.name }}</p>
         </a>
         {% endfor %}
     </div>
 </div>
-<div class="card mx-4 mt-4 border rounded-4">
+<div class="card mx-4 mt-4 border rounded-4 rounded-bottom-0">
     <h4 class="text-center mt-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-percent text-danger" viewBox="0 0 16 16">
   <path d="M13.442 2.558a.625.625 0 0 1 0 .884l-10 10a.625.625 0 1 1-.884-.884l10-10a.625.625 0 0 1 .884 0zM4.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm7 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
 </svg>منتخب محصولات تخفیف و حراج</h4>

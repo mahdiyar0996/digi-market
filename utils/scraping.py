@@ -1,29 +1,36 @@
 # # # # import os
 # # # # from products.models import Category
 # # #
-import requests
-from threading import Thread
+import sys
 
-def request_to_site():
-    for i in range(1, 10000):
-        a = requests.get('http://127.0.0.1:8000/')
-t1 = Thread(target=request_to_site)
-t2 = Thread(target=request_to_site)
-t3 = Thread(target=request_to_site)
-t4 = Thread(target=request_to_site)
-t5 = Thread(target=request_to_site)
-t6 = Thread(target=request_to_site)
-t7 = Thread(target=request_to_site)
-t8 = Thread(target=request_to_site)
-t1.start()
-t2.start()
-t3.start()
-t4.start()
-t5.start()
-t6.start()
-t7.start()
-t8.start()
-
+# import requests
+# from threading import Thread
+# import redis
+# s = redis.StrictRedis(host='127.0.0.1', db=1)
+# import sys
+# from main.settings import cache
+# s = s.get(':1:views.decorators.cache.cache_header.users-api.820077858725d2b984ea9950019aa29f.en-us.UTC')
+# print(sys.getsizeof(s))
+# def request_to_site():
+#     for i in range(1, 10000):
+#         a = requests.get('http://127.0.0.1:8000/')
+# t1 = Thread(target=request_to_site)
+# t2 = Thread(target=request_to_site)
+# t3 = Thread(target=request_to_site)
+# t4 = Thread(target=request_to_site)
+# t5 = Thread(target=request_to_site)
+# t6 = Thread(target=request_to_site)
+# t7 = Thread(target=request_to_site)
+# t8 = Thread(target=request_to_site)
+# t1.start()
+# t2.start()
+# t3.start()
+# t4.start()
+# t5.start()
+# t6.start()
+# t7.start()
+# t8.start()
+#
 
 
 #

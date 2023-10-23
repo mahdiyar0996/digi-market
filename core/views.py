@@ -14,6 +14,8 @@ from django.http.response import HttpResponse
 class HomeView(View):
     @debugger
     def get(self, request):
+        s = User.objects.select_related('profile').all()
+        print(s)
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         header = cache.lrange('header_home', 0, -1)
         if not header:
@@ -32,7 +34,6 @@ class HomeView(View):
             recent_views = recent_views.split(' ')
         if sub_sub_categories is None:
             sub_sub_categories = SubSubCategory.all_sub_categories_with_products(request, recent_views)
-        print(sub_sub_categories)
         return render(request, 'home.html', {'category': category,
                                              'subcategory': subcategory,
                                              "sub_sub_categories": sub_sub_categories,

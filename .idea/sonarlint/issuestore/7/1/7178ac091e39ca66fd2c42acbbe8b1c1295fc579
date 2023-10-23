@@ -1,5 +1,4 @@
 
 Bpython:S125"Remove this commented out code.(ûù­Îûÿÿÿÿ8¥ÄÜª±1
-Dpython:S1481"%Remove the unused local variable "i".(ûÎï8¨ÄÜª±1
-Dpython:S1481	"%Remove the unused local variable "a".(ÈŠÿŠ8§ÄÜª±1
-=python:S125-"Remove this commented out code.(Øıó§8©ÄÜª±1
+Bpython:S125"Remove this commented out code.(™Ÿ«‰ÿÿÿÿÿ8Éİ­¸µ1
+=python:S1254"Remove this commented out code.(Øıó§8©ÄÜª±1

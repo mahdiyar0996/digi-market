@@ -116,3 +116,13 @@ X
 (products/templates/subcategory-list.html,f/2/f223e195d9766936a5dd052d37696d84d0222d72
 C
 products/signals.py,9/8/98b89ce851a07408f84a620fba5b5066c4e73909
+A
+users/api/urls.py,5/f/5fd1a4d38fe675b6b23e93b09369fba95bf3e180
+H
+users/api/serializers.py,1/1/11b44adb1cd9384e1eabe500d3c264b3bf032f60
+B
+users/api/views.py,7/9/79e0010a196017126f27b8743d586a610b7775a1
+H
+users/api/permissions.py,8/c/8cb1bf9b2940f3e7055cba66d9a36b32d936695f
+C
+users/api/tokens.py,8/5/85ac1a16e14282b1ffdbb04bbec413d449aa8b2c
