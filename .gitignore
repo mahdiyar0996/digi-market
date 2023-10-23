@@ -1,3 +1,4 @@
 main/localsettings.py
 .pytest_cache/
+.idea/
 venv/
