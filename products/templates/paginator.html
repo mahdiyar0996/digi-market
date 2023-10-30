@@ -1,0 +1,63 @@
+{% if paginator.num_pages > 1 %}
+<form aria-label="..." class="d-flex justify-content-center align-items-center col-12 mt-5" style="height: 38px">
+  <ul class="pagination">
+  {% if products.has_next %}
+    <li class="page-item">
+        <button class="page-link" type="submit" name="page" value="{{ paginator.num_pages }}"><< </button>
+    </li>
+      {% if products.number|add:10 < paginator.num_pages %}
+    <li class="page-item">
+      <button class="page-link" type="submit" name="page" value="{{ products.number|add:10 }}">{{ products.number|add:10 }}</button>
+    </li>
+      {% endif %}
+      {% if products.number|add:2 < paginator.num_pages %}
+    <li class="page-item">
+      <button class="page-link" type="submit" name="page" value="{{ products.number|add:2 }}">{{ products.number|add:2 }}</button>
+    </li>
+      {% endif %}
+    <li class="page-item">
+        <button type="submit" name="page" value="{{ products.number|add:1 }}" class="page-link" href="#">{{ products.number|add:1 }}</button>
+    </li>
+  {% else %}
+           <li class="page-item invisible">
+        <button class="page-link" type="submit" name="page" value=""><< </button>
+    </li>
+    <li class="page-item invisible">
+      <button class="page-link" type="submit" name="page" value=""><</button>
+    </li>
+    <li class="page-item invisible"><button type="submit" name="page" value="" class="page-link" href="#">{{ products.number|add:1 }}</button></li>
+  {% endif %}
+    <li class="page-item active" aria-current="page">
+      <a class="page-link" href="#">{{ products.number }}</a>
+    </li>
+  {% if products.has_previous %}
+      {% if products.number|add:-1 < products.number %}
+    <li class="page-item">
+      <button class="page-link" type="submit" name="page" value="{{ products.number|add:-1 }}">{{ products.number|add:-1 }}</button>
+    </li>
+      {% endif %}
+      {% if products.number|add:-3 < products.number %}
+    <li class="page-item">
+        <button class="page-link" type="submit" name="page" value="{{ products.number|add:-2 }}" href="#">{{ products.number|add:-2 }}</button>
+    </li>
+      {% endif %}
+      {% if products.number|add:-3 < products.number %}
+    <li class="page-item">
+        <button class="page-link" type="submit" name="page" value="{{ products.number|add:-10 }}">{{ products.number|add:-10 }} </button>
+    </li>
+      {% endif %}
+    <li class="page-item">
+        <button class="page-link" type="submit" name="page" value="1">>> </button>
+    </li>
+      {% else %}
+      <li class="page-item invisible"><button class="page-link" type="submit" name="page" value="" href="#"></button></li>
+    <li class="page-item">
+        <button class="page-link invisible" type="submit" name="page" value="">> </button>
+    </li>
+    <li class="page-item">
+        <button class="page-link invisible" type="submit" name="page" value="1">>> </button>
+    </li>
+  {% endif %}
+  </ul>
+</form>
+{% endif %}

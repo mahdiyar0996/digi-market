@@ -15,7 +15,6 @@ class HomeView(View):
     @debugger
     def get(self, request):
         s = User.objects.select_related('profile').all()
-        print(s)
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         header = cache.lrange('header_home', 0, -1)
         if not header:
@@ -28,10 +27,10 @@ class HomeView(View):
         if products is None:
             products = Product.filter_product_with_most_discount(request, category__name='home')
         ipaddress = request.META.get('REMOTE_ADDR')
-        sub_sub_categories = django_cache.get(f'user_recent_products{ipaddress}')
         recent_views = request.COOKIES.get('by-recent-views', [])
         if isinstance(recent_views, str):
             recent_views = recent_views.split(' ')
+        sub_sub_categories = django_cache.get(f'by_user_recent_views{ipaddress}')
         if sub_sub_categories is None:
             sub_sub_categories = SubSubCategory.all_sub_categories_with_products(request, recent_views)
         return render(request, 'home.html', {'category': category,

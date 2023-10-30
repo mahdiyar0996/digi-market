@@ -49,8 +49,11 @@ class SubCategoryListView(View):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         products = django_cache.get(f'products_{category}')
         sub_sub_categories = django_cache.get(f'sub_sub_categories{category}')
+        if not sub_sub_categories:
+            sub_sub_categories = SubSubCategory.objects.filter(category__name=category)
+            django_cache.set(f'sub_sub_categories{category}', sub_sub_categories)
         if not products:
-            products, sub_sub_categories = Product.filter_product_with_sub_sub_category(request, category)
+            products = Product.filter_product_with_sub_sub_category(request, category)
         paginator = Paginator(products, 20)
         page = request.GET.get('page')
         try:
@@ -68,13 +71,15 @@ class SubCategoryListView(View):
                                                          'paginator': paginator})
 
 
+
 class SubSubCategoryList(View):
+    @debugger
     def get(self, request, category):
+        page = request.GET.get('page', 1)
         products = django_cache.get(f'products_{category}')
         if products is None:
-            products = Product.filter_products_and_get_sub_sub_categories(request, category)
+            products = Product.filter_products_and_get_sub_sub_categories(request, category, page)
         paginator = Paginator(products, 20)
-        page = request.GET.get('page')
         try:
             products = paginator.page(page)
         except PageNotAnInteger:
@@ -85,13 +90,13 @@ class SubSubCategoryList(View):
             max_price = products[0]['max_price']
         else:
             max_price = None
-        f_product = products[0]
-        brand = f_product['category__brand']
-        details = f_product['category__details']
+        sub_sub_category = django_cache.get(category)
+        if sub_sub_category is None:
+            sub_sub_category = SubSubCategory.objects.only('name', 'details', 'brand').get(name=category)
+            django_cache.set(category, sub_sub_category)
         return render(request, 'sub-subcategory-list.html', {'products': products,
                                                              'paginator': paginator,
-                                                             'brand': brand,
-                                                             'details': details,
+                                                             'category': sub_sub_category,
                                                              'max_price': max_price})
 
 
@@ -105,7 +110,7 @@ class ProductDetailsView(View):
         if not any([product, product_images]):
             product, product_images = ProductImage.get_product_and_images(request, product_id)
         product_comments = django_cache.get(f'comments:{product_id}', False)
-        if not product_comments:
+        if not product_comments and not cache.keys(f'*comments:{product_id}'):
             product_comments = ProductComment.is_active_comments(product_id)
         try:
             product_details = product.details.items()

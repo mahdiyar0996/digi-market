@@ -56,7 +56,7 @@
             </a>
             <div class="ms-2 my-1 collapse" id="brand">
                     <div class="card-body">
-                        {% for key,value in brand.items %}
+                        {% for key,value in category.brand.items %}
                         <div class="w-100 my-3 border border-start-0 border-end-0 border-top-0">
                             <label for="{{ value }}" class="d-flex flex-row justify-content-between align-items-center w-100 form-check-label">
                                 <span class="form-check-label text-nowrap">
@@ -71,7 +71,7 @@
                         {% endfor %}
                     </div>
             </div>
-            {% for key,value in details.items %}
+            {% for key,value in category.details.items %}
             <a  style="height: 57px;" class="text-start d-block pt-3 mt-1 fs-5 text-decoration-none border border-start-0
               border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#id{{ key|cut:" " }}"
                 href="#id{{ key|cut:" " }}" role="button" aria-expanded="false">
@@ -138,11 +138,12 @@
             <button type="submit" class="btn btn-primary text-center mb-3">اعمال فیلتر</button>
             </div>
         </form>
+        </a>
     </div>
     <div class="col-12 col-lg-9 d-flex flex-row mt-0" style="height: 100vh; justify-self: end">
         <div class="row justify-content-lg-start" style="width: 100%">
         {% for field in products %}
-         <a href="{% url 'product-details' field.category__name field.id %}" class="d-block d-sm-flex col-12 col-sm-6 col-lg-3 d-flex  flex-column justify-content-center align-items-center p-3 text-center text-decoration-none border" style="height: 400px" id="product-box">
+         <a href="{% url 'product-details' category.name field.id %}" class="d-block d-sm-flex col-12 col-sm-6 col-lg-3 d-flex  flex-column justify-content-center align-items-center p-3 text-center text-decoration-none border" style="height: 400px" id="product-box">
             <img src="{{ field.avatar }}" alt="" class="w-75" height="200" id="product-img">
             <p class="d-block" style="height: 80px">{{ field.name }}</p>
             <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
@@ -167,33 +168,7 @@
          {% endif %}
         </a>
         {% endfor %}
-        {% if paginator.num_pages > 1 %}
-            <form aria-label="..." class="d-flex justify-content-center align-items-center col-12 mt-5" style="height: 38px">
-              <ul class="pagination">
-              {% if products.has_next %}
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="{{ paginator.num_pages }}"><< </button>
-                </li>
-                <li class="page-item">
-                  <button class="page-link" type="submit" name="page" value="{{ products.next_page_number }}"><</button>
-                </li>
-                <li class="page-item"><button type="submit" name="page" value="{{ products.number|add:1 }}" class="page-link" href="#">{{ products.number|add:1 }}</button></li>
-              {% endif %}
-                <li class="page-item active" aria-current="page">
-                  <a class="page-link" href="#">{{ products.number }}</a>
-                </li>
-              {% if products.has_previous %}
-                <li class="page-item"><button class="page-link" type="submit" name="page" value="{{ products.number|add:-1 }}" href="#">{{ products.number|add:-1 }}</button></li>
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="{{ products.previous_page_number }}">> </button>
-                </li>
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="1">>> </button>
-                </li>
-              {% endif %}
-              </ul>
-            </form>
-            {% endif %}
+        {% include 'paginator.html' %}
         </div>
     </div>
 </div>

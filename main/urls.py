@@ -23,10 +23,9 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView
 )
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),  #oauth urls
+    # path('accounts/', include('allauth.urls')),  #oauth urls
     path('captcha/', include('captcha.urls')),   #captcha urls
     path("__debug__/", include("debug_toolbar.urls")), #django toolbar urls
     path('api-auth/', include('rest_framework.urls')), #rest framework urls

@@ -4,7 +4,7 @@ import string
 
 from django.db import models
 from .managers import ProductManager
-from django.db.models import Sum, Count, F, Avg, Max
+from django.db.models import Sum, Count, F, Avg, Max, Prefetch, Subquery, QuerySet, Q
 from main.settings import cache
 from django.core.cache import cache as django_cache
 from utils.tools import get_discount
@@ -92,16 +92,16 @@ class SubSubCategory(BaseAbstract):
     @classmethod
     def all_sub_categories_with_products(cls, request, categories):
         if len(categories) > 0:
-            sub_sub_categories = cls.objects.prefetch_related('product').filter(id__in=categories)[:4]
+            sub_sub_categories = cls.objects.only('name', 'avatar').filter(id__in=categories)[:4]
         else:
-            sub_sub_categories = cls.objects.prefetch_related('product').all()[:4]
+            sub_sub_categories = cls.objects.only('name', 'avatar').all()[:4]
         ipaddress = request.META.get('REMOTE_ADDR')
-        django_cache.set(f'user_recent_products{ipaddress}', sub_sub_categories, 60 * 10)
+        django_cache.set(f'by_user_recent_views{ipaddress}', sub_sub_categories, 60 * 2)
         return sub_sub_categories
 
 
 class Product(BaseAbstract):
-    category = models.ForeignKey(SubSubCategory, verbose_name='مجموعه', related_name='%(class)s', on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(SubSubCategory, verbose_name='مجموعه', related_name='%(class)s', on_delete=models.DO_NOTHING, db_index=True)
     brand = models.CharField("برند", max_length=55, blank=True, null=True)
     description = models.TextField("درباره کالا", max_length=1000, blank=True, null=True)
     details = models.JSONField("جزییات", blank=True, null=True)
@@ -145,24 +145,22 @@ class Product(BaseAbstract):
     def filter_product_with_sub_sub_category(cls, request, category_name):
         products = Product.objects.select_related('category').annotate(
             average=Avg('productcomment__rating'), max_price=Max('price')).values('category__name',
-            'name', 'id', 'avatar', 'price', 'discount','details','max_price',
+            'name', 'id', 'avatar', 'price', 'discount', 'details', 'max_price',
             'stock', 'average').filter(category__category__name=category_name)
-        sub_sub_categories = set()
+        # sub_sub_categories = set()
         for item in products:
-            sub_sub_categories.add(item['category__name'])
+            # sub_sub_categories.add(item['category__name'])
             item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = '{:,}'.format(get_discount(item['price'], item['discount']))
             item['price'] = '{:,}'.format(item['price'])
-        django_cache.set(f'sub_sub_categories{category_name}', sub_sub_categories, 60 * 10)
+        # django_cache.set(f'sub_sub_categories{category_name}', sub_sub_categories, 60 * 10)
         django_cache.set(f'products_{category_name}', products, 60 * 10)
-        return products, sub_sub_categories
+        return products
 
     @classmethod
-    def filter_products_and_get_sub_sub_categories(cls, request, category_name):
-        products = cls.objects.select_related('category').annotate(
-            average=Avg('productcomment__rating'), max_price=Max('price')).values('category__name','category__brand',
-                                                                                  'category__details',
-                                                                                  'name', 'id', 'avatar', 'price',
+    def filter_products_and_get_sub_sub_categories(cls, request, category_name, page):
+        products = cls.objects.annotate(
+            average=Avg('productcomment__rating'), max_price=Max('price')).values('name', 'id', 'avatar', 'price',
                                                                                   'discount', 'details', 'max_price',
                                                                                   'stock', 'average', ).filter(
             category__name=category_name)
@@ -170,7 +168,7 @@ class Product(BaseAbstract):
             item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = '{:,}'.format(get_discount(item['price'], item['discount']))
             item['price'] = '{:,}'.format(item['price'])
-        django_cache.set(f'products_{category_name}', products, 60 * 10)
+        django_cache.set(f'products_{category_name}', products, 60 * 2)
         return products
 
 

@@ -32,7 +32,7 @@ class ProductImageAdmin(admin.StackedInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('مشخصات محصول', {'fields': ('category', 'name', 'description', 'details', 'warranty')}),
+        ('مشخصات محصول', {'fields': ('category', 'name', 'brand', 'description', 'details', 'warranty')}),
         ('قیمت محصول', {'fields': ('price', 'discount')}),
         (None, {'fields': ('colour', 'stock', 'avatar')}),
         ('دسترسی ها', {'fields': ('is_active', )}),

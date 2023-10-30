@@ -5,8 +5,6 @@
 users/tokens.py,2/e/2e27a1e670323f6c3ab3599ba9688df2f7248de3
 >
 users/tests.py,2/3/233a16b9bcdb821f3598bcbef17c91efb65fa793
-h
-8venv/lib/python3.10/site-packages/MySQLdb/connections.py,2/5/251ec4f5c00da85a5b8e68734b8cd37b4c65790f
 P
  users/migrations/0001_initial.py,a/a/aa2b019e6f6bf6fa64eff808af7b58f0ae1bbc56
 @
@@ -19,8 +17,6 @@ P
 ,users/templates/password-reset-complete.html,f/8/f8ea525f3fff75c0ba227c2d8326aa4a5fc4daa8
 M
 users/templates/register.html,2/9/292d2f239d67ea75d9d3a4632c9674b88af5a483
-a
-1venv/lib/python3.10/site-packages/allauth/urls.py,f/d/fda216c8f2fc44eab46b9d0987d7bb028956feb8
 =
 users/urls.py,7/e/7ebb6dc32a2768a7e73ce1c83409f9c85bd4ad6a
 J
@@ -126,3 +122,5 @@ H
 users/api/permissions.py,8/c/8cb1bf9b2940f3e7055cba66d9a36b32d936695f
 C
 users/api/tokens.py,8/5/85ac1a16e14282b1ffdbb04bbec413d449aa8b2c
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d

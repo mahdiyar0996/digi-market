@@ -135,33 +135,7 @@
          {% endif %}
         </a>
         {% endfor %}
-            {% if paginator.num_pages > 1 %}
-            <form aria-label="..." class="d-flex justify-content-center align-items-center col-12 mt-5" style="height: 38px">
-              <ul class="pagination">
-              {% if products.has_next %}
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="{{ paginator.num_pages }}"><< </button>
-                </li>
-                <li class="page-item">
-                  <button class="page-link" type="submit" name="page" value="{{ products.next_page_number }}"><</button>
-                </li>
-                <li class="page-item"><button type="submit" name="page" value="{{ products.number|add:1 }}" class="page-link" href="#">{{ products.number|add:1 }}</button></li>
-              {% endif %}
-                <li class="page-item active" aria-current="page">
-                  <a class="page-link" href="#">{{ products.number }}</a>
-                </li>
-              {% if products.has_previous %}
-                <li class="page-item"><button class="page-link" type="submit" name="page" value="{{ products.number|add:-1 }}" href="#">{{ products.number|add:-1 }}</button></li>
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="{{ products.previous_page_number }}">> </button>
-                </li>
-                <li class="page-item">
-                    <button class="page-link" type="submit" name="page" value="1">>> </button>
-                </li>
-              {% endif %}
-              </ul>
-            </form>
-            {% endif %}
+            {% include 'paginator.html' %}
         </div>
     </div>
 </div>

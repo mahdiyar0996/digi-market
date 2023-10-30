@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .views import CategoryListView, SubCategoryListView, ProductDetailsView, SubSubCategoryList
 
 urlpatterns = [
+    path('', include('products.api.urls')),
     path('category/<str:category>/', CategoryListView.as_view(), name='category-list'),
     path('subcategory/<str:category>/', SubCategoryListView.as_view(), name='subcategory-list'),
     path('category/<str:category>/products/', SubSubCategoryList.as_view(), name='sub-subcategory-list'),

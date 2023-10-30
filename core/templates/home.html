@@ -10,16 +10,26 @@
         {#height: 100%;#}
                     }
                     }
+    @media only screen and (min-width: 500px) {
+    #header-img {
+        height: 400px;
+                    }
+                    }
+    @media only screen and (max-width: 500px) {
+    #header-img {
+        height: 350px;
+                    }
+                    }
 </style>
 {% endblock %}
-
+{% load filters %}
 {% block content %}
 <header>
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
       {% for image in header %}
-    <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
-      <img src="{{ image }}" class="d-block img-fluid" alt="..." >
+    <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}" id="header-img">
+      <img src="{{ image }}" class="d-block object-fit-cover h-100 w-100" alt="..."  >
     </div>
       {% endfor %}
   </div>
@@ -64,7 +74,7 @@
     <div class="row flex-row text-center g-1 mt-4 mx-0 w-100 gx-0 gap-0">
         {% for field in products %}
         <a href="{% url 'product-details' field.category__name field.id %}" class="col-6 col-sm-4 col-md-3 col-lg-2 border border-bottom-0 border-opacity-50 mt-0 text-decoration-none align-items-">
-            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="150" height="150" class="">
+            <img id="sub-category-img" src="{{ field.avatar }}" alt="" width="150" height="150" class="mt-2">
             <div class="d-flex flex-row justify-content-between mt-4">
             <span style="height: 24px" class=" {% if field.discount == 0 %}invisible{% endif %} bg-danger">{{ field.discount }}%</span>
             <div class="{% if field.discount != 0 %} text-light-emphasis{% endif %}">
@@ -84,11 +94,13 @@
                 <div class="ms-3 mt-2">{{ category.name }}</div>
                 <div class="ms-3 mt-2" style="font-size: 12px">بر اساس بازدید های شما</div>
                 <div class="row w-100 gx-0">
-                {% for product in category.product.all|slice:4 %}
+                {% for product in products|filter_by_category:category.name%}
+                    {% if forloop.counter0 < 4 %}
                     <a href="{% url 'product-details' category.name product.id %}"  class="col-6 border {% cycle 'border-start-0' 'border-end-0' 'border-start-0' 'border-end-0' %}
                             border-top-0">
-                        <img src="{{ request.build_absolute_uri }}media/{{ product.avatar }}" alt="" class="img-fluid" height="119">
+                        <img src="{{ product.avatar }}" alt="" class="img-fluid" height="119">
                     </a>
+                    {% endif %}
                 {% endfor %}
                 </div>
             </div>

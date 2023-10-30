@@ -41,8 +41,9 @@ class ApiUserDetailsView(generics.RetrieveAPIView,
     authentication_classes = [JWTAuthentication]
     permission_classes = [FullPermission]
     serializer_class = UserSerializer
+
     @debugger
-    @method_decorator(cache_page(60 * 2, key_prefix='users-details-api'))
+    @method_decorator(cache_page(60 * 15, key_prefix='users-details-api'))
     @method_decorator(vary_on_headers("Authorization", ))
     def get(self, request, *args, **kwargs):
         if self.get_object() is None:
