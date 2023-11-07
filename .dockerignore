@@ -1,7 +1,6 @@
-main/localsettings.py
+venv/
 .pytest_cache/
 .idea/
-venv/
 __pycache__/
 */pycache__/
 docker/mysql/

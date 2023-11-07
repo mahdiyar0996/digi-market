@@ -178,7 +178,7 @@ DATABASES = {       #DJANGO TARIF DATABASE
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": CACHE_LOCATION,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "SOCKET_CONNECT_TIMEOUT": 5,  # seconds  connection timeout
@@ -197,7 +197,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 
-cache = Redis('127.0.0.1', port=6379, db=1, socket_timeout=5, decode_responses=True )
+cache = Redis(c_host, port=6379, db=1, socket_timeout=5, decode_responses=True )
 
 
 AUTH_PASSWORD_VALIDATORS = [

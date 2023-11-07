@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  db:
+    image: "mysql:8.0.35"
+    expose:
+      - 3306
+    ports:
+      - "4000:3306"
+    container_name: "mysql"
+    restart: always
+#    volumes:
+#      - "/var/lib/mysql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: Mysql@0996
+      MYSQL_PASSWORD: Mysql@0996
+      MYSQL_DATABASE: digi_market
+  redis:
+    image: "redis:7.0.8-alpine"
+    restart: always
+    container_name: "cache"
+    expose:
+      - 6379
+  backend:
+    build: .
+    image: "webserver:test"
+    restart: always
+    container_name: "django"
+#    command: python3 manage.py runserver 0.0.0.0:8000
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Mysql@0996
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+#    command: ["python", "manage.py", "migrate", "&&", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - ".:/app"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+networks:
+  default:
+    name: "server-net"
+    internal: true
+
