@@ -35,3 +35,7 @@ M
 users/templates/register.html,2/9/292d2f239d67ea75d9d3a4632c9674b88af5a483
 J
 users/templates/login.html,7/9/793c96990c42260b726e24a2e7d4ca5327df621c
+A
+products/views.py,e/7/e7c0df80dbe407ceab2293cb3ce846b3cc0b1733
+H
+core/templates/home.html,d/b/dbc3db4b6ada24c5e4859028e2285ae9d5ae37ad
