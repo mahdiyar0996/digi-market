@@ -78,6 +78,7 @@
             </div>
         </div>
         <div class="col-12 col-md-9 card justify-content-center align-items-center mt-5 px-3">
+        {% if products %}
             {% for product in products %}
             <div class="my-3 row flex-column w-100 h-100">
                 <div class="row flex-row my-3 justify-content-between">
@@ -111,6 +112,14 @@
                 <hr>
             </div>
             {% endfor %}
+            {% else %}
+            <div class="d-flex justify-content-center align-items-center flex-column">
+            <img src="/media/basket_empty-removebg-preview-removebg-preview.png" width="300" height="300" class="d-block text-center ms-5" )"></img>
+                <div class="text-center me-4">
+            سبد خرید خالی است
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

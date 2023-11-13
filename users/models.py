@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
                                     validators=[valid_phone_number()],
                                     error_messages={'unique': 'این شماره قبلا انتخاب شده است',
                                                     'invalid': 'شماره وارد شده نا معتبر است'})
-    credits = models.BigIntegerField('موجودی', null=True, blank=True)
+    credits = models.BigIntegerField('موجودی', null=True, blank=True, default=0)
     password = models.CharField('رمز عبور', max_length=255,
                                 error_messages={'invalid': 'رمز کاربری باید ۸ کاراکتر یا بیشتر باشد و یک حرف بزرگ داشته باشد'})
     city = models.CharField('شهر', max_length=55, blank=True, null=True,  db_index=True)
@@ -134,21 +134,31 @@ class Profile(models.Model):
 
     @classmethod
     def get_user_and_profile(cls, request, user: User):
-        profile = cls.objects.select_related('user').values('avatar', 'first_name', 'last_name', 'job', 'age',
-                                                              'user__username', 'user__email', 'user__phone_number',
-                                                              'user__credits', 'user__city', 'user__address',
-                                                            ).get(user=user)
-        profile['avatar'] = request.build_absolute_uri("/media/" + profile['avatar'])
-        profile_copy = profile.copy()
-        user_data = {}
-        for key, value in profile_copy.items():
-            if 'user' in key:
-                user_data[key.replace('user__', '')] = value
-                profile.pop(key)
+        profile = cls.objects.select_related('user').only('avatar', 'first_name', 'last_name', 'job', 'age',
+                                                          'user__username', 'user__email', 'user__phone_number',
+                                                          'user__credits', 'user__city', 'user__address',
+                                                          ).get(user=user)
+        profile.avatar = request.build_absolute_uri("/media/" + str(profile.avatar))
+        if_null = lambda x: x if x is not None else ''
+        profile_data = {
+            'avatar': str(profile.avatar),
+            'first_name': if_null(profile.first_name),
+            'last_name': if_null(profile.last_name),
+            'job': if_null(profile.job),
+            'age': if_null(profile.age),
+        }
+        user_data = {
+            'username': profile.user.username,
+            'email': profile.user.email,
+            'phone_number': if_null(profile.user.phone_number),
+            'credits': profile.user.credits,
+            'city': if_null(profile.user.city),
+            'address': if_null(profile.user.address)
+        }
         with cache.pipeline() as pipeline:
             pipeline.hset(f'user{user.id}', mapping=user_data)
             pipeline.expire(f"user{user.id}", 7200)
-            pipeline.hset(f'profile{user.id}', mapping=profile)
+            pipeline.hset(f'profile{user.id}', mapping=profile_data)
             pipeline.expire(f"profile{user.id}", 7200)
             pipeline.execute()
         return user_data, profile
