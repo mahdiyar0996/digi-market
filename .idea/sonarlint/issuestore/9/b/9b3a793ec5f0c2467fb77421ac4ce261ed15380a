@@ -1,9 +1,9 @@
 
-fpython:S2208"GImport only needed names or import the module and then use its members.(‰í—Õ8•ƒ…Ä¼1
->python:S125–"Remove this commented out code.(¶ŞçŸ8œì‹Ä¼1
-Cpython:S125Ÿ"Remove this commented out code.(”æ‚¨úÿÿÿÿ8–ƒ…Ä¼1
->python:S125¥"Remove this commented out code.(Œœ8–ƒ…Ä¼1
-=python:S125Ç"Remove this commented out code.(†¾ê_8–ƒ…Ä¼1
-Cpython:S125Ñ"Remove this commented out code.(ü³ãÄıÿÿÿÿ8–ƒ…Ä¼1
-psecrets:S6687	"KMake sure this Django key gets revoked, changed, and removed from the code.(´£ƒšüÿÿÿÿ8¢ª­Åº1
-|secrets:S6691†"[Make sure this Google OAuth client secret gets revoked, changed, and removed from the code.(º÷Â§8§ª­Åº1
+fpython:S2208"GImport only needed names or import the module and then use its members.(‰í—Õ8ôØ¨À¾1
+>python:S125˜"Remove this commented out code.(¶ŞçŸ8÷Ø¨À¾1
+Cpython:S125¡"Remove this commented out code.(”æ‚¨úÿÿÿÿ8÷Ø¨À¾1
+>python:S125§"Remove this commented out code.(Œœ8÷Ø¨À¾1
+=python:S125É"Remove this commented out code.(†¾ê_8÷Ø¨À¾1
+Cpython:S125Ó"Remove this commented out code.(ü³ãÄıÿÿÿÿ8÷Ø¨À¾1
+psecrets:S6687	"KMake sure this Django key gets revoked, changed, and removed from the code.(´£ƒšüÿÿÿÿ8Ù¨À¾1
+|secrets:S6691ˆ"[Make sure this Google OAuth client secret gets revoked, changed, and removed from the code.(º÷Â§8“Ù¨À¾1
