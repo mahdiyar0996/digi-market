@@ -85,6 +85,8 @@ ROOT_URLCONF = 'main.urls'
 INTERNAL_IPS = [     #django debug toolbar interal ip address
     # ...
     "127.0.0.1",
+    '10.0.0.5',
+    'localhost'
     # ...
 ]
 
@@ -121,9 +123,9 @@ TEMPLATES = [
         },
     },
 ]
+LOGIN_REDIRECT_URL = '/profile/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-LOGIN_REDIRECT_URL = '/profile/'
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -164,8 +166,12 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
-#CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://localhost']
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SAMESITE = 'None'
+#
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://localhost', "http://10.0.0.5", "https://10.0.0.5"]
 
 DATABASES = {       #DJANGO TARIF DATABASE
     "default": {

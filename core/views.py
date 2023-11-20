@@ -5,7 +5,7 @@ from .models import Header
 from products.models import Category, SubCategory, SubSubCategory,Product, ProductImage
 from utils.decorators import debugger
 from PIL import Image
-from django.db.models import F
+from django.db.models import F, Q
 from main.settings import cache
 from django.core.cache import cache as django_cache
 from django.http.response import HttpResponse
@@ -41,5 +41,7 @@ class HomeView(View):
                                              'user': user})
 class SearchView(View):
     def get(self, request):
-        pass
-
+        user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
+        query_string = request.GET.get('q')
+        query = Product.objects.filter(Q(name__contains=query_string) | Q(description__contains=query_string))
+        return render(request, 'search.html', {'query': query, 'user': user})
