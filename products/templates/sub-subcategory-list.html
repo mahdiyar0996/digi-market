@@ -141,7 +141,7 @@
         </a>
     </div>
     <div class="col-12 col-lg-9 d-flex flex-row mt-0" style="height: 100vh; justify-self: end">
-        <div class="row justify-content-lg-start" style="width: 100%">
+        <div class="row justify-content-lg-start mx-0" style="width: 100%">
         {% for field in products %}
          <a href="{% url 'product-details' category.name field.id %}" class="d-block d-sm-flex col-12 col-sm-6 col-lg-3 d-flex  flex-column justify-content-center align-items-center p-3 text-center text-decoration-none border" style="height: 400px" id="product-box">
             <img src="{{ field.avatar }}" alt="" class="w-75" height="200" id="product-img">

@@ -24,7 +24,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     image: "webserver:test"
     restart: always
     container_name: "backend"
@@ -43,6 +43,19 @@ services:
     depends_on:
       - db
       - redis
+  nginx:
+    image: "nginx:1.25.3"
+    restart: always
+    container_name: "nginx"
+    volumes:
+      - "./nginx/:/etc/nginx/"
+      - "/etc/ssl/:/etc/ssl/"
+      - "./static:/var/www/static"
+      - "./media:/var/www/media"
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 networks:
   default:
     name: "server-net"
