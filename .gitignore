@@ -6,4 +6,5 @@ __pycache__/
 */pycache__/
 docker/mysql/
 data/
-
+access.log
+error.log
