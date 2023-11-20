@@ -1,15 +1,14 @@
-version: "3.9"
 services:
   db:
-    image: "mysql:8.0.35"
+    image: "mysql:8.2"
     expose:
       - 3306
     ports:
       - "4000:3306"
-    container_name: "mysql"
+    container_name: "db"
     restart: always
-#    volumes:
-#      - "/var/lib/mysql:/var/lib/mysql"
+    volumes:
+      - "/home/mahdiyar/Desktop/digi-market/data:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: Mysql@0996
       MYSQL_PASSWORD: Mysql@0996
@@ -17,15 +16,18 @@ services:
   redis:
     image: "redis:7.0.8-alpine"
     restart: always
-    container_name: "cache"
+    container_name: "redis"
+    volumes:
+      - "/var/lib/redis/:/var/lib/redis/"
     expose:
       - 6379
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: "webserver:test"
     restart: always
-    container_name: "django"
-#    command: python3 manage.py runserver 0.0.0.0:8000
+    container_name: "backend"
     environment:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
@@ -34,7 +36,6 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_DB: 1
-#    command: ["python", "manage.py", "migrate", "&&", "python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
       - ".:/app"
     ports:
@@ -42,8 +43,20 @@ services:
     depends_on:
       - db
       - redis
+  nginx:
+    image: "nginx:1.25.3"
+    restart: always
+    container_name: "nginx"
+    volumes:
+      - "./nginx/:/etc/nginx/"
+      - "/etc/ssl/:/etc/ssl/"
+      - "./static:/var/www/static"
+      - "./media:/var/www/media"
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 networks:
   default:
     name: "server-net"
     internal: true
-

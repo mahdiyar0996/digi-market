@@ -3,15 +3,18 @@ from pathlib import Path
 import os
 from redis import Redis
 from datetime import timedelta
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-4r9=agvch57*(+l)456=tm57&zb=)lh!q_qm0_qz$(q_^x()+x'
 
 
-DEBUG = True
+DEBUG = debug
 
 ALLOWED_HOSTS = ['*']
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -129,8 +132,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'email',
         ],
         'APP': {
-            'client_id': '549261432966-2q8kb3oai7l2frj5jb8i82g01sg1ei39.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': '1040217592476-6hv85829ogdoofgqsjlicoh25bevm3rk.apps.googleusercontent.com',
+            'secret': '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',
             'key': ''
         },
         'AUTH_PARAMS': {
@@ -146,6 +149,10 @@ MEDIA_URL = '/media/'
 
 STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = 'static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, '*/static')
+# ]
+
 
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'home'
@@ -157,8 +164,8 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
-CSRF_COOKIE_SECURE = True
-
+#CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://localhost']
 
 DATABASES = {       #DJANGO TARIF DATABASE
     "default": {
@@ -197,7 +204,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 
-cache = Redis(c_host, port=6379, db=1, socket_timeout=5, decode_responses=True )
+cache = Redis(c_host, port=c_port, db=c_db, socket_timeout=5, decode_responses=True )
 
 
 AUTH_PASSWORD_VALIDATORS = [

@@ -44,7 +44,6 @@ class CategoryListView(View):
 
 
 class SubCategoryListView(View):
-    @debugger
     def get(self, request, category):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         products = django_cache.get(f'products_{category}')
@@ -54,16 +53,19 @@ class SubCategoryListView(View):
             django_cache.set(f'sub_sub_categories{category}', sub_sub_categories)
         if not products:
             products = Product.filter_product_with_sub_sub_category(request, category)
-        paginator = Paginator(products, 20)
-        page = request.GET.get('page')
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-        max_price = products[0]['max_price']
-        print(sub_sub_categories)
+        if products:
+            paginator = Paginator(products, 20)
+            page = request.GET.get('page')
+            try:
+                products = paginator.page(page)
+            except PageNotAnInteger:
+                products = paginator.page(1)
+            except EmptyPage:
+                products = paginator.page(paginator.num_pages)
+            max_price = products[0]['max_price']
+        else:
+            paginator = None
+            max_price = None
         return render(request, 'subcategory-list.html', {'products': products,
                                                          'max_price': max_price,
                                                          'user': user,
@@ -73,7 +75,6 @@ class SubCategoryListView(View):
 
 
 class SubSubCategoryList(View):
-    @debugger
     def get(self, request, category):
         page = request.GET.get('page', 1)
         products = django_cache.get(f'products_{category}')
@@ -101,7 +102,6 @@ class SubSubCategoryList(View):
 
 
 class ProductDetailsView(View):
-    @debugger
     def get(self, request, category, product_id,):
         form = ProductCommentForm
         user = cache.hgetall(f'user{request.session.get("_auth_user_id", False)}')
@@ -145,7 +145,6 @@ class ProductDetailsView(View):
             response.set_cookie('by-recent-views', str(product.category.id))
         return response
 
-    @debugger
     def post(self, request, category, product_id):
         try:
             if request.POST.get('delete-from-basket', False):

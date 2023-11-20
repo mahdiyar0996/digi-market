@@ -9,6 +9,7 @@
 {% block content %}
 
 <form class="container-lg mt-5 bg-dark-subtle pt-4 " action="" method="POST" style="height: 100%;">
+    {% csrf_token %}
     <img src="/media/site_images/logo%20image.jpg" class="float-end d-none d-lg-block" style="height: 100%; width: 430px" alt="">
     <h2 class="text-center mb-5">ورود</h2>
     <div class="mb-4">حسابی ندارید؟
@@ -19,7 +20,6 @@
     {% include "socialaccount/snippets/provider_list.html" with process="login" %}
     {% endcache %}
     </div>
-{% csrf_token %}
     <label for="" class="d-block mb-4">نام کاربری</label>
     <input type="text"value="{% if form.username.value %}{{ form.username.value }}{% endif %}" class="form-control" style="min-width: 200px; max-width: 400px"
     id="username" placeholder="نام کاربری یا ایمیل خود را وارد کنید" required name="{{ form.username.name }}">

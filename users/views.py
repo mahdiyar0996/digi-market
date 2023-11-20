@@ -25,14 +25,9 @@ class RegisterView(View):
         if len(user) > 0:
             return redirect('profile')
         form = RegisterForm()
-        context = {'form': form}
-        return render(request, 'register.html', context)
+        return render(request, 'register.html', {'form': form, 'user': user})
 
     def post(self, request):
-        initial_dict = {
-            "username": request.POST.get('username'),
-            "email": request.POST.get('email'),
-        }
         form = RegisterForm(request.POST, initial=request.POST)
         if form.is_valid():
             cd = form.cleaned_data
@@ -51,8 +46,7 @@ class RegisterView(View):
                                              'error_msg': 'مشکل در ارسال ایمیل تایید دوباره امتحان کنید'
                                              })
             return render(request, 'register.html', {'form': form})
-        context = {'form': form}
-        return render(request, 'register.html', context, status=400)
+        return render(request, 'register.html', {'form': form, 'user': False}, status=400)
 
 
 class RegisterCompleteView(View):
@@ -102,7 +96,7 @@ class LoginView(View):
                 return redirect('profile')
             return render(request, 'login.html', {'form': form}, status=400)
         messages.error(request, 'نام کاربری یا رمز عبور اشتباه است', 'danger')
-        return render(request, 'login.html', {'form': form}, status=400)
+        return render(request, 'login.html', {'form': form, 'user': False}, status=400)
 
 
 class Logout(View):
@@ -167,11 +161,10 @@ class PasswordResetCompleteView(View):
 
 
 class ProfileView(View):
-    @debugger
     def get(self, request):
         user = cache.hgetall(f'user{request.session["_auth_user_id"]}')
         profile = cache.hgetall(f'profile{request.session["_auth_user_id"]}')
-
+        print(request.user)
         if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
         return render(request, 'profile.html', {'user': user, 'profile': profile})
