@@ -147,6 +147,7 @@ class Product(BaseAbstract):
             average=Avg('productcomment__rating'), max_price=Max('price')).values('category__name',
             'name', 'id', 'avatar', 'price', 'discount', 'details', 'max_price',
             'stock', 'average').filter(category__category__name=category_name)
+        max_price = Product.objects.filter(category__category__name=category_name).aggregate(max_price=Max('price'))
         # sub_sub_categories = set()
         for item in products:
             # sub_sub_categories.add(item['category__name'])
@@ -155,21 +156,24 @@ class Product(BaseAbstract):
             item['price'] = '{:,}'.format(item['price'])
         # django_cache.set(f'sub_sub_categories{category_name}', sub_sub_categories, 60 * 10)
         django_cache.set(f'products_{category_name}', products, 60 * 10)
-        return products
+        django_cache.set(f'product_max_price{category_name}', max_price, 60 * 10)
+        return products, max_price
 
     @classmethod
     def filter_products_and_get_sub_sub_categories(cls, request, category_name, page):
         products = cls.objects.annotate(
-            average=Avg('productcomment__rating'), max_price=Max('price')).values('name', 'id', 'avatar', 'price',
-                                                                                  'discount', 'details', 'max_price',
-                                                                                  'stock', 'average', ).filter(
+            average=Avg('productcomment__rating')).values('name', 'id', 'avatar', 'price',
+                                                          'discount', 'details',
+                                                          'stock', 'average', ).filter(
             category__name=category_name)
+        max_price = Product.objects.filter(category__name=category_name).aggregate(max_price=Max('price'))
         for item in products:
             item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = '{:,}'.format(get_discount(item['price'], item['discount']))
             item['price'] = '{:,}'.format(item['price'])
         django_cache.set(f'products_{category_name}', products, 60 * 2)
-        return products
+        django_cache.set(f'product_max_price{category_name}', max_price, 60 * 2)
+        return products, max_price
 
 
     @classmethod
@@ -185,6 +189,7 @@ class Product(BaseAbstract):
             item['price'] = '{:,}'.format(item['price'])
         django_cache.set(f'discounted_products{category}', products, 60 * 10)
         return products
+
 
 
 class ProductImage(models.Model):

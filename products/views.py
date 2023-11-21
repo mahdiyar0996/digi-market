@@ -47,12 +47,13 @@ class SubCategoryListView(View):
     def get(self, request, category):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         products = django_cache.get(f'products_{category}')
+        max_price = django_cache.get(f'product_max_price{category}')
         sub_sub_categories = django_cache.get(f'sub_sub_categories{category}')
         if not sub_sub_categories:
             sub_sub_categories = SubSubCategory.objects.filter(category__name=category)
             django_cache.set(f'sub_sub_categories{category}', sub_sub_categories)
         if not products:
-            products = Product.filter_product_with_sub_sub_category(request, category)
+            products, max_price = Product.filter_product_with_sub_sub_category(request, category)
         if products:
             paginator = Paginator(products, 20)
             page = request.GET.get('page')
@@ -62,10 +63,8 @@ class SubCategoryListView(View):
                 products = paginator.page(1)
             except EmptyPage:
                 products = paginator.page(paginator.num_pages)
-            max_price = products[0]['max_price']
         else:
             paginator = None
-            max_price = None
         return render(request, 'subcategory-list.html', {'products': products,
                                                          'max_price': max_price,
                                                          'user': user,
@@ -76,10 +75,12 @@ class SubCategoryListView(View):
 
 class SubSubCategoryList(View):
     def get(self, request, category):
+        user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         page = request.GET.get('page', 1)
         products = django_cache.get(f'products_{category}')
+        max_price = django_cache.get(f'product_max_price{category}')
         if products is None:
-            products = Product.filter_products_and_get_sub_sub_categories(request, category, page)
+            products, max_price = Product.filter_products_and_get_sub_sub_categories(request, category, page)
         paginator = Paginator(products, 20)
         try:
             products = paginator.page(page)
@@ -87,18 +88,16 @@ class SubSubCategoryList(View):
             products = paginator.page(1)
         except EmptyPage:
             products = paginator.page(paginator.num_pages)
-        if len(products) > 0:
-            max_price = products[0]['max_price']
-        else:
-            max_price = None
         sub_sub_category = django_cache.get(category)
         if sub_sub_category is None:
             sub_sub_category = SubSubCategory.objects.only('name', 'details', 'brand').get(name=category)
             django_cache.set(category, sub_sub_category)
+        print(max_price)
         return render(request, 'sub-subcategory-list.html', {'products': products,
                                                              'paginator': paginator,
                                                              'category': sub_sub_category,
-                                                             'max_price': max_price})
+                                                             'max_price': max_price,
+                                                             "user": user})
 
 
 class ProductDetailsView(View):

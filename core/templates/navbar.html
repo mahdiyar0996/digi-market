@@ -7,8 +7,8 @@
         </button>
         <a class="navbar-brand col-9 col-md-10 col-lg-2 text-center" href="{% url 'home' %}">دیجی مارکت</a>
         <div class="collapse navbar-collapse grid justify-content-center align-items-center" id="navbarSupportedContent">
-        <form class="d-flex mt-2 mt-lg-0 col-md-5 justify-content-center align-items-center" role="search" method="GET" action="">
-            <input class="form-control " type="search" placeholder="جستجو" aria-label="Search">
+        <form class="d-flex mt-2 mt-lg-0 col-md-5 justify-content-center align-items-center" role="search" method="GET" action="{% url 'search' %}">
+            <input class="form-control" name="q" type="search" placeholder="جستجو" aria-label="Search">
             <button class="btn btn-outline-success d-none" type="submit">جستجو</button>
       </form>
             <ul class="navbar-nav mb-2 mb-lg-0 col-md-3">

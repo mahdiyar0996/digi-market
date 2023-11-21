@@ -101,12 +101,12 @@
                     <div class="card-body">
                         <div class="d-flex flex-column flex-nowrap align-items-center">
                             <span class="w-100">از
-                            <input id="min_price" type="text" class="form-control form-text border border-top-0 border-end-0 border-start-0 ms-2" placeholder="0" name="min_price" min="0" max="{{ max_price }}" oninput="this.nextElementSibling.value = this.value">
+                            <input id="min_price" type="text" class="form-control form-text border border-top-0 border-end-0 border-start-0 ms-2" placeholder="0" name="min_price" min="0" max="{{ max_price.max_price }}" oninput="this.nextElementSibling.value = this.value">
                             </span>
                             <div class="w-100 mt-2">
                             <span class="">
                                  تا
-                                <input id="max_price" dir="rtl" type="range" class="ms-2 form-control form-range" name="max_price" value="0" min="0" max="{{ max_price }}" oninput="this.nextElementSibling.value = this.value">
+                                <input id="max_price" dir="rtl" type="range" class="ms-2 form-control form-range" name="max_price" value="0" min="0" max="{{ max_price.max_price }}" oninput="this.nextElementSibling.value = this.value">
                                 <output>0</output>
                             </span>
                             </div>

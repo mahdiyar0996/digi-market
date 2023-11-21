@@ -5,7 +5,7 @@ from .models import Header
 from products.models import Category, SubCategory, SubSubCategory,Product, ProductImage
 from utils.decorators import debugger
 from PIL import Image
-from django.db.models import F, Q
+from django.db.models import F, Q, Max
 from main.settings import cache
 from django.core.cache import cache as django_cache
 from django.http.response import HttpResponse
@@ -14,7 +14,6 @@ from django.http.response import HttpResponse
 class HomeView(View):
     @debugger
     def get(self, request):
-        s = User.objects.select_related('profile').all()
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         header = cache.lrange('header_home', 0, -1)
         if not header:
@@ -40,8 +39,20 @@ class HomeView(View):
                                              'header': header,
                                              'user': user})
 class SearchView(View):
+    @debugger
     def get(self, request):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         query_string = request.GET.get('q')
-        query = Product.objects.filter(Q(name__contains=query_string) | Q(description__contains=query_string))
-        return render(request, 'search.html', {'query': query, 'user': user})
+        products = Product.objects.select_related('category').filter(Q(name__contains=query_string) | Q(description__contains=query_string))
+        max_price = Product.objects.filter(Q(name__contains=query_string) | Q(description__contains=query_string)).aggregate(max_price=Max('price'))
+        sub_subcategories = SubSubCategory.objects.filter(Q(product__name__contains=query_string) | Q(product__description__contains=query_string)).distinct().only('id', 'name', 'brand')
+        brands = {}
+        for i, v in enumerate(sub_subcategories):
+            for key, value in v.brand.items():
+                if value not in brands:
+                    brands[key] = value
+        return render(request, 'search.html', {'products': products,
+                                               'brands': brands,
+                                               'max_price': max_price,
+                                               'sub_subcategories': sub_subcategories,
+                                               'user': user})

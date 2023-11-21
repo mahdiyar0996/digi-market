@@ -3,8 +3,150 @@
 
 {% endblock %}
 {% block css %}
-
+    <style>
+    @media only screen and (min-width: 990px) {
+    #filter {
+        display: block;
+        width: 100%;
+        {#height: 100%;#}
+                    }
+        }
+    @media only screen and (min-width: 1008px) {
+        #filter {
+            width: 50%;
+        }
+    }
+    @media only screen and (max-width: 990px) {
+        #min_price {
+            width: 75%;
+                        }
+            }
+    @media only screen and (max-width: 990px) {
+        #max_price {
+            width: 75%;
+        }
+    }
+    </style>
 {% endblock %}
 {% block content %}
-
+<div class="row">
+    <div class="card col-lg-3 col-12  flex-column position-sticky mt-0 " style="height: max-content">
+        <h4 class="card-title text-center d-none d-lg-block mt-2">فیلتر</h4>
+        <a style="" class="d-block d-lg-none my-3 ms-3 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#filter" href="#filter" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+            </svg>
+            فیلتر
+            </a>
+        <form onsubmit="validate()" class="ms-2 collapse w-100" action="" method="GET" id="filter">
+            <a style="height: 57px" class="text-start d-block fs-5 pt-3 text-decoration-none border border-start-0 border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#categories" href="#categories" role="button" aria-expanded="false" aria-controls="collapseExample">
+            دسته بندی ها
+            </a>
+            <div class="ms-2 my-1 collapse" id="categories">
+                {% for category in sub_subcategories %}
+                    <div class="card-body">
+                        <input type="checkbox" name="category" value="{{ category }}">
+                        {{ category }}
+                    </div>
+                {% endfor %}
+            </div>
+             <a  style="height: 57px;" class="text-start d-block pt-3 mt-1 fs-5 text-decoration-none border border-start-0
+              border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#brand"
+                href="#price" role="button" aria-expanded="false" aria-controls="collapseExample">
+                برند
+            </a>
+            <div class="ms-2 my-1 collapse" id="brand">
+                    <div class="card-body">
+                        {% for key,value in brands.items %}
+                        <div class="w-100 my-3 border border-start-0 border-end-0 border-top-0">
+                            <label for="{{ value }}" class="d-flex flex-row justify-content-between align-items-center w-100 form-check-label">
+                                <span class="form-check-label text-nowrap">
+                                    <input name="brand" value="{{ value }}" id="{{ value }}" type="checkbox" class="form-check-input">
+                                    {{ value }}
+                                </span>
+                                <span class="text-nowrap">
+                                    {{ key }}
+                                </span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+            </div>
+            <a style="height: 57px;" class="text-start d-block pt-3 mt-1 fs-5 text-decoration-none border border-start-0  border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#price" href="#price" role="button" aria-expanded="false" aria-controls="collapseExample">
+            محدوده قیمت
+            </a>
+            <div class="ms-2 my-1 collapse" id="price">
+                    <div class="card-body">
+                        <div class="d-flex flex-column flex-nowrap align-items-center">
+                            <span class="w-100">از
+                            <input id="min_price" type="text" class="form-control form-text border border-top-0 border-end-0 border-start-0 ms-2" placeholder="0" name="min_price" min="0" max="{{ max_price.max_price }}" oninput="this.nextElementSibling.value = this.value">
+                            </span>
+                            <div class="w-100 mt-2">
+                            <span class="">
+                                 تا
+                                <input id="max_price" dir="rtl" type="range" class="ms-2 form-control form-range" name="max_price" value="0" min="0" max="{{ max_price.max_price }}" oninput="this.nextElementSibling.value = this.value">
+                                <output>0</output>
+                            </span>
+                            </div>
+                                <script>
+                                    function validate() {
+                                         var min_price = document.getElementById('min_price').value;
+                                         var max_price = document.getElementById('max_price').value;
+                                         var var1 = 0.001;
+                                         if (min_price < var1) {
+                                          document.getElementById("min_price").disabled = true;
+                                         }
+                                         if (max_price < var1){
+                                             document.getElementById("max_price").disabled = true;
+                                         }
+                                         return true;
+                                        }
+                                </script>
+                        </div>
+                    </div>
+            </div>
+            <div class="d-flex mt-2 align-self-start border border-start-0 border-end-0 pt-2" style="height: 57px;">
+                <div class="form-check form-check-inline w-100 h-100">
+                    <input name="is_active" id="is_active" type="checkbox" class="form-check-input d-inline mt-2" style="height: 24px; width: 24px">
+                    <label role="button" for="is_active" class="form-check-label ms-3 mt-2 w-100 h-100">فقط کالاهای موجود</label>
+                </div>
+            </div>
+            <br>
+            <div class="d-flex justify-content-center align-items-center">
+            <button type="submit" class="btn btn-primary text-center mb-3">اعمال فیلتر</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-12 col-lg-9 d-flex flex-row mt-0 px-0 ps-4" style="height: 100vh; justify-self: end">
+        <div class="row justify-content-lg-start" style="width: 100%">
+        {% for field in products %}
+         <a href="{% url 'product-details' field.category field.id %}" class="d-block d-sm-flex col-12 col-sm-6 col-lg-3 d-flex  flex-column justify-content-center align-items-center text-center text-decoration-none border ps-5 ps-sm-2 p-3 " style="height: 400px" id="product-box">
+            <img src="{{ field.avatar.url }}" alt="" class="w-75" height="200" id="product-img">
+            <p class="d-block " style="height: 80px" >{{ field.name|truncatewords:9 }}</p>
+            <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                <p class="d-block {% if field.stock < 10 or field.stock == None %}text-danger{% endif %}" style="justify-self: start">{% if field.stock > 0 or field.stock != None%}تعداد در انبار{{ field.stock }}{% else %}ناموجود{% endif %}</p>
+                <p class="d-block" style="justify-self: end">{% if field.average > 0 %}{{ field.average|floatformat:1 }}{% else %}0{% endif %}
+                    <svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill text-warning mb-1" viewBox="0 0 16 16">
+                      <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                    </svg>
+                </p>
+            </div>
+            {% if field.discount %}
+            <div class="d-flex w-100 justify-content-between">
+            <div class="bg-danger" style="justify-self: start">{{ field.discount }}%</div>
+            <div class="" style="justify-self: end"> {{ field.get_discount }}تومان </div>
+            </div>
+            <div class="text-decoration-line-through text-muted text-end w-100">{{ field.split_price }}تومان </div>
+            {% else %}
+            <div class="d-flex flex-row w-100 justify-content-between" style="height: 50px">
+                <div class="invisible"></div>
+                <div class="" style="justify-self: end"> {{ field.split_price }}تومان </div>
+            </div>
+            {% endif %}
+        </a>
+        {% endfor %}
+            {% include 'paginator.html' %}
+        </div>
+    </div>
+</div>
 {% endblock %}
