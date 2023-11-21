@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -14,7 +14,6 @@ from utils.email_senders import send_token_email
 from utils.decorators import debugger
 from datetime import datetime
 from main.settings import cache
-import json
 from django.core.cache import cache as django_cache
 
 
@@ -109,7 +108,7 @@ class Logout(View):
 class PasswordResetTokenView(View):
     def get(self, request):
         form = PasswordResetSendTokenForm()
-        return render(request, 'password_reset_send_token.html', {"form": form})
+        return render(request, 'password_reset_send_token.html', {'form': form})
 
     def post(self, request):
         form = PasswordResetSendTokenForm(request.POST)
@@ -118,56 +117,68 @@ class PasswordResetTokenView(View):
             try:
                 user = User.objects.get(email__exact=email)
                 current_site = get_current_site(request)
-                send_token_email(request, user, {'subject': "بازیابی رمز عبور",
-                                                 'to_email': form.cleaned_data.get('email'),
-                                                 'template': 'email/user_password_reset_message.html',
-                                                 'user': user,
-                                                 'domain': current_site.domain,
-                                                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                                                 'token': Prtg().make_token(user),
-                                                 'success_msg': 'ایمیل بازیابی به ایمیل شما ارسال شد',
-                                                 'error_msg': 'مشکل در ارسال ایمیل باز یابی دوباره امتحان کنید'
-                                                 })
+                token_data = {
+                    'subject': "بازیابی رمز عبور",
+                    'to_email': email,
+                    'template': 'email/user_password_reset_message.html',
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': Prtg().make_token(user),
+                    'success_msg': 'ایمیل بازیابی به ایمیل شما ارسال شد',
+                    'error_msg': 'مشکل در ارسال ایمیل بازیابی دوباره امتحان کنید'
+                }
+                send_token_email(request, user, token_data)
             except User.DoesNotExist:
                 messages.error(request, "کاربری با این ایمیل وجود ندارد", 'danger')
         return render(request, 'password_reset_send_token.html', {'form': form})
 
 
+
 class PasswordResetCompleteView(View):
     def get(self, request, uidb64, token):
         form = PasswordResetForm()
-        return render(request, 'password-reset-complete.html', {'form': form})
+        context = {'form': form}
+        return render(request, 'password-reset-complete.html', context)
 
     def post(self, request, uidb64, token):
         form = PasswordResetForm(request.POST)
+        context = {'form': form}
+
         if form.is_valid():
             password1 = form.cleaned_data.get('password1')
             password2 = form.cleaned_data.get('password2')
+
             if password1 != password2:
                 messages.error(request, 'رمز عبور با تکرار رمز مطابقت ندارد', 'danger')
-                return render(request, 'password-reset-complete.html', {'form': form})
+                return render(request, 'password-reset-complete.html', context)
+
             try:
                 user = User.objects.get(pk=urlsafe_base64_decode(uidb64))
             except User.DoesNotExist:
                 user = None
+
             if user and Prtg().check_token(user, token):
                 user.set_password(password1)
                 user.last_password_reset = datetime.now()
                 user.save()
                 messages.success(request, 'رمز عبور شما با موفقیت تغییر پیدا کرد ', 'success')
                 return redirect('login')
+
             messages.error(request, 'لینک باز یابی معتبر نمی باشد', 'danger')
-        return render(request, 'password-reset-complete.html', {'form': form})
+
+        return render(request, 'password-reset-complete.html', context)
 
 
 class ProfileView(View):
     def get(self, request):
-        user = cache.hgetall(f'user{request.session["_auth_user_id"]}')
-        profile = cache.hgetall(f'profile{request.session["_auth_user_id"]}')
-        print(request.user)
+        user_id = request.session["_auth_user_id"]
+        user = cache.hgetall(f'user{user_id}')
+        profile = cache.hgetall(f'profile{user_id}')
         if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
-        return render(request, 'profile.html', {'user': user, 'profile': profile})
+        context = {'user': user, 'profile': profile}
+        return render(request, 'profile.html', context)
 
 
 class ProfileChangeView(View):
@@ -175,38 +186,61 @@ class ProfileChangeView(View):
     def get(self, request):
         user = cache.hgetall(f'user{request.session["_auth_user_id"]}')
         profile = cache.hgetall(f'profile{request.session["_auth_user_id"]}')
+
         if not any([len(user) > 0, len(profile) > 0]):
             user, profile = Profile.get_user_and_profile(request, request.user)
+
         data = user | profile
         form = UserForm(initial=data)
-        return render(request, 'personal_info.html', {'form': form,
-                                                      'profile': profile,
-                                                      'user': user})
+
+        context = {
+            'form': form,
+            'profile': profile,
+            'user': user
+        }
+
+        return render(request, 'personal_info.html', context)
 
     def post(self, request):
         user = request.user
         form = UserForm(request.POST, initial=request.POST)
+
         if form.is_valid():
             cd = form.cleaned_data
             user.save(**cd)
             user.profile.save(**cd)
             return redirect('profile')
-        return render(request, 'personal_info.html', {'form': form, 'user': user,
-                                                      'profile': user.profile})
+
+        context = {
+            'form': form,
+            'user': user,
+            'profile': user.profile
+        }
+
+        return render(request, 'personal_info.html', context)
 
 
 class ProfileBasketView(View):
     @debugger
     def get(self, request):
-        user = cache.hgetall(f"user{request.session.get('_auth_user_id', False)}")
-        profile = cache.hgetall(f"profile{request.session.get('_auth_user_id', False)}")
+        user_id = request.session.get('_auth_user_id', False)
+        user = cache.hgetall(f"user{user_id}")
+        profile = cache.hgetall(f"profile{user_id}")
+
         if any([len(user) < 1, len(profile) < 1]):
             user, profile = Profile.get_user_and_profile(request, request.user)
-        products = django_cache.get(f"user_basket{request.session.get('_auth_user_id', False)}")
-        if not products:
-            products = products = UserBasket.filter_basket_products(request, request.user)
-        return render(request, 'profile-basket.html', {'products': products, 'user': user, 'profile': profile})
 
+        products = django_cache.get(f"user_basket{user_id}")
+        if not products:
+            products = UserBasket.filter_basket_products(request, request.user)
+
+        context = {
+            'products': products,
+            'user': user,
+            'profile': profile
+        }
+
+        return render(request, 'profile-basket.html', context)
 
 
 

@@ -1,5 +1,3 @@
-import datetime
-import pickle
 from django.shortcuts import render, reverse, redirect
 from django.views import View
 from .models import SubCategory, Category, SubSubCategory, Product, ProductComment, ProductImage

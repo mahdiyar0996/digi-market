@@ -20,6 +20,19 @@
         height: 350px;
                     }
                     }
+    #products-groups:nth-child(2n+0){
+        border-right: #dee6eb solid 1px;
+    }
+    #products-groups:nth-child(2n+1){
+        border-left: #dee6eb solid 1px;
+    }
+    #products-groups:nth-child(1){
+        border-bottom: #dee6eb solid 1px;
+    }
+    #products-groups:nth-child(2){
+        border-bottom: #dee6eb solid 1px;
+    }
+
 </style>
 {% endblock %}
 {% load filters %}
@@ -96,11 +109,10 @@
             <div class="col-lg-3 col-6 border border-bottom-0 border-top-0 g-0 gap-0 w-1">
                 <div class="ms-3 mt-2">{{ category.name }}</div>
                 <div class="ms-3 mt-2" style="font-size: 12px">بر اساس بازدید های شما</div>
-                <div class="row w-100 gx-0">
+                <div class="row w-100 gx-0" >
                 {% for product in products|filter_by_category:category.name%}
                     {% if forloop.counter0 < 4 %}
-                    <a href="{% url 'product-details' category.name product.id %}"  class="col-6 border {% cycle 'border-start-0' 'border-end-0' 'border-start-0' 'border-end-0' %}
-                            border-top-0">
+                    <a href="{% url 'product-details' category.name product.id %}"  class="col-6" id="products-groups">
                         <img src="{{ product.avatar }}" alt="" class="img-fluid" height="119">
                     </a>
                     {% endif %}

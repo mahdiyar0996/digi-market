@@ -9,10 +9,12 @@ from main.settings import cache
 from django.core.cache import cache as django_cache
 from utils.tools import get_discount
 
+
 class BaseAbstract(models.Model):
     name = models.CharField("نام", max_length=255)
     created_at = models.DateTimeField('تاریخ انتشار', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ آخرین اپدیت', auto_now=True)
+
     class Meta:
         abstract = True
 
@@ -58,8 +60,6 @@ class SubCategory(BaseAbstract):
     @classmethod
     def filter_subcategory_with_category(cls,request ,category_name):
         subcategory = cls.objects.filter(category__name__exact=category_name).values('name', 'avatar')
-        for item in subcategory:
-            item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
         django_cache.set(f'list_of_subcategories{category_name}', subcategory, 60 * 5)
         return subcategory
 
@@ -84,8 +84,6 @@ class SubSubCategory(BaseAbstract):
     def filter_categories_with_category_list(cls, request, subcategories, category_name):
         subcategory_list = [i['name'] for i in subcategories]
         sub_sub_category = cls.objects.values('name', 'avatar').filter(category__name__in=subcategory_list)
-        for item in sub_sub_category:
-            item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
         django_cache.set(f'sub_sub_categories{category_name}', sub_sub_category, 60 * 10)
         return sub_sub_category
 
@@ -148,13 +146,9 @@ class Product(BaseAbstract):
             'name', 'id', 'avatar', 'price', 'discount', 'details', 'max_price',
             'stock', 'average').filter(category__category__name=category_name)
         max_price = Product.objects.filter(category__category__name=category_name).aggregate(max_price=Max('price'))
-        # sub_sub_categories = set()
         for item in products:
-            # sub_sub_categories.add(item['category__name'])
-            item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = '{:,}'.format(get_discount(item['price'], item['discount']))
             item['price'] = '{:,}'.format(item['price'])
-        # django_cache.set(f'sub_sub_categories{category_name}', sub_sub_categories, 60 * 10)
         django_cache.set(f'products_{category_name}', products, 60 * 10)
         django_cache.set(f'product_max_price{category_name}', max_price, 60 * 10)
         return products, max_price
@@ -181,8 +175,11 @@ class Product(BaseAbstract):
         category = kwargs.get('category__name')
         if category == 'home':
             del kwargs['category__name']
-        products = cls.objects.select_related('category').values('category__name', "id", 'avatar', "name",
-                                                                 "price", 'discount').filter(discount__gte=discount, **kwargs)[:18]
+        products = cls.objects.select_related('category').values('category__name', "id",
+                                                               'avatar', "name",
+                                                               "price", 'discount'
+                                                               ).filter(
+            discount__gte=discount, **kwargs)[:18]
         for item in products:
             item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = "{:,}".format(item['price'] - (item['price'] * item['discount'] // 100))
