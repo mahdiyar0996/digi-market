@@ -13,7 +13,7 @@
 <h2 class="text-center mb-4">ثبت نام</h2>
 {% cache 10000 provider %}
 <div class="mb-4" style="width: 200px">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+    {% include "socialaccount/snippets/provider_list.html" with process="register" %}
 </div>
 {% endcache %}
 {% csrf_token %}
