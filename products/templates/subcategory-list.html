@@ -41,7 +41,7 @@
 {% endblock %}
 {% block content %}
 <div class="row flex-lg-row flex-column mt-1">
-    <div class="card col-lg-3 col-12  flex-column position-sticky mt-0 " style="height: max-content">
+     <div class="card col-lg-3 col-12  flex-column position-sticky mt-0 " style="height: max-content">
         <h4 class="card-title text-center d-none d-lg-block mt-2">فیلتر</h4>
         <a style="" class="d-block d-lg-none my-3 ms-3 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#filter" href="#filter" role="button" aria-expanded="false" aria-controls="collapseExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
@@ -49,7 +49,7 @@
             </svg>
             فیلتر
             </a>
-        <form onsubmit="validate()" class="ms-2 collapse w-100" action="" method="GET" id="filter">
+        <form onsubmit="validate()" class="ms-2 collapse w-100" action="{% url 'search' %}" method="GET" id="filter">
             <a style="height: 57px" class="text-start d-block fs-5 pt-3 text-decoration-none border border-start-0 border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#categories" href="#categories" role="button" aria-expanded="false" aria-controls="collapseExample">
             دسته بندی ها
             </a>
@@ -60,6 +60,28 @@
                         {{ category }}
                     </div>
                 {% endfor %}
+            </div>
+             <a  style="height: 57px;" class="text-start d-block pt-3 mt-1 fs-5 text-decoration-none border border-start-0
+              border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#brand"
+                href="#price" role="button" aria-expanded="false" aria-controls="collapseExample">
+                برند
+            </a>
+            <div class="ms-2 my-1 collapse" id="brand">
+                    <div class="card-body">
+                        {% for key,value in brands.items %}
+                        <div class="w-100 my-3 border border-start-0 border-end-0 border-top-0">
+                            <label for="{{ value }}" class="d-flex flex-row justify-content-between align-items-center w-100 form-check-label">
+                                <span class="form-check-label text-nowrap">
+                                    <input name="brand" value="{{ key }}" id="{{ value }}" type="checkbox" class="form-check-input">
+                                    {{ value }}
+                                </span>
+                                <span class="text-nowrap">
+                                    {{ key }}
+                                </span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
             </div>
             <a style="height: 57px;" class="text-start d-block pt-3 mt-1 fs-5 text-decoration-none border border-start-0  border-end-0 border-bottom-0" data-bs-toggle="collapse" data-bs-target="#price" href="#price" role="button" aria-expanded="false" aria-controls="collapseExample">
             محدوده قیمت
@@ -75,7 +97,6 @@
                                  تا
                                 <input id="max_price" dir="rtl" type="range" class="ms-2 form-control form-range" name="max_price" value="0" min="0" max="{{ max_price.max_price }}" oninput="this.nextElementSibling.value = this.value">
                                 <output>0</output>
-
                             </span>
                             </div>
                                 <script>

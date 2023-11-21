@@ -44,6 +44,7 @@ class CategoryListView(View):
 
 
 class SubCategoryListView(View):
+    @debugger
     def get(self, request, category):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         products = django_cache.get(f'products_{category}')
@@ -65,15 +66,22 @@ class SubCategoryListView(View):
                 products = paginator.page(paginator.num_pages)
         else:
             paginator = None
+        brands = {}
+        for i, v in enumerate(sub_sub_categories):
+            for key, value in v.brand.items():
+                if value not in brands:
+                    brands[key] = value
         return render(request, 'subcategory-list.html', {'products': products,
                                                          'max_price': max_price,
                                                          'user': user,
+                                                         'brands': brands,
                                                          'sub_sub_categories': sub_sub_categories,
                                                          'paginator': paginator})
 
 
 
 class SubSubCategoryList(View):
+    @debugger
     def get(self, request, category):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         page = request.GET.get('page', 1)
@@ -92,7 +100,6 @@ class SubSubCategoryList(View):
         if sub_sub_category is None:
             sub_sub_category = SubSubCategory.objects.only('name', 'details', 'brand').get(name=category)
             django_cache.set(category, sub_sub_category)
-        print(max_price)
         return render(request, 'sub-subcategory-list.html', {'products': products,
                                                              'paginator': paginator,
                                                              'category': sub_sub_category,
