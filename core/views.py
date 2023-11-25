@@ -6,7 +6,7 @@ from utils.decorators import debugger
 from django.db.models import F, Q, Max
 from main.settings import cache
 from django.core.cache import cache as django_cache
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class HomeView(View):
     @debugger
@@ -112,8 +112,17 @@ class SearchView(View):
         except UnboundLocalError:
             return render(request, 'search.html', {'user': user})
 
+        page = request.GET.get('page', 1)
+        paginator = Paginator(products, 20)
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
         return render(request, 'search.html', {
             'products': products,
+            'paginator': paginator,
             'brands': brands,
             'max_price': max_price,
             'sub_subcategories': sub_subcategories,

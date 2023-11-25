@@ -1,5 +1,5 @@
 {% if paginator.num_pages > 1 %}
-<form aria-label="..." class="d-flex justify-content-center align-items-center col-12 mt-5" style="height: 38px">
+<form aria-label="..." method="GET" action="" class="d-flex justify-content-center align-items-center col-12 mt-5" style="height: 38px">
   <ul class="pagination">
   {% if products.has_next %}
     <li class="page-item">
@@ -19,7 +19,7 @@
         <button type="submit" name="page" value="{{ products.number|add:1 }}" class="page-link" href="#">{{ products.number|add:1 }}</button>
     </li>
   {% else %}
-           <li class="page-item invisible">
+    <li class="page-item invisible">
         <button class="page-link" type="submit" name="page" value=""><< </button>
     </li>
     <li class="page-item invisible">
@@ -36,12 +36,12 @@
       <button class="page-link" type="submit" name="page" value="{{ products.number|add:-1 }}">{{ products.number|add:-1 }}</button>
     </li>
       {% endif %}
-      {% if products.number|add:-3 < products.number %}
+      {% if products.number|add:-3 < products.number and products.number|add:-3 > 0 %}
     <li class="page-item">
         <button class="page-link" type="submit" name="page" value="{{ products.number|add:-2 }}" href="#">{{ products.number|add:-2 }}</button>
     </li>
       {% endif %}
-      {% if products.number|add:-3 < products.number %}
+      {% if products.number|add:-10 < products.number and products.number|add:-10 > 0 %}
     <li class="page-item">
         <button class="page-link" type="submit" name="page" value="{{ products.number|add:-10 }}">{{ products.number|add:-10 }} </button>
     </li>
