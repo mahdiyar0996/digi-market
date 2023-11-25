@@ -77,16 +77,15 @@ class SubCategoryListView(View):
                                                          'paginator': paginator})
 
 
-
 class SubSubCategoryList(View):
     @debugger
     def get(self, request, category):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         page = request.GET.get('page', 1)
-        products = django_cache.get(f'products_{category}')
+        products = django_cache.get(f'products_{category}') if not request.GET else False
         max_price = django_cache.get(f'product_max_price{category}')
-        if products is None:
-            products, max_price = Product.filter_products_and_get_sub_sub_categories(request, category, page)
+        if not products:
+            products, max_price = Product.filter_products_and_max_price(request, category, page)
         paginator = Paginator(products, 20)
         try:
             products = paginator.page(page)

@@ -154,20 +154,53 @@ class Product(BaseAbstract):
         return products, max_price
 
     @classmethod
-    def filter_products_and_get_sub_sub_categories(cls, request, category_name, page):
+    def filter_products_and_max_price(cls, request, category_name, page):
         products = cls.objects.annotate(
             average=Avg('productcomment__rating')).values('name', 'id', 'avatar', 'price',
                                                           'discount', 'details',
                                                           'stock', 'average', ).filter(
             category__name=category_name)
-        max_price = Product.objects.filter(category__name=category_name).aggregate(max_price=Max('price'))
+        maximum = Product.objects.filter(category__name=category_name).aggregate(max_price=Max('price'))
+
+        request.GET._mutable = True
+
+        brand = request.GET.getlist('brand', False)
+        request.GET.pop('brand') if brand else None
+
+        min_price = request.GET.get('min_price', 0)
+        max_price = request.GET.get('max_price')
+        request.GET.pop('min_price') if min_price else None
+        request.GET.pop('max_price') if max_price else None
+
+        is_active = request.GET.get('is_active')
+        request.GET.pop('is_active') if is_active else None
+
+        details = request.GET
+
+        if brand:
+            products = products.filter(brand__in=brand)
+
+        if min_price or max_price:
+            products = products.annotate(maximum=Max('price')).filter(
+                price__gte=min_price,
+                price__lte=max_price or F('maximum')
+            )
+        if is_active:
+            products = products.filter(is_active=True)
+
+        if details:
+            for key, value in details.items():
+                dic = {f"details__{key}": value}
+                products = products.filter(**dic)
+
         for item in products:
             item['avatar'] = request.build_absolute_uri('/media/' + item['avatar'])
             item['discounted_price'] = '{:,}'.format(get_discount(item['price'], item['discount']))
             item['price'] = '{:,}'.format(item['price'])
+
         django_cache.set(f'products_{category_name}', products, 60 * 2)
-        django_cache.set(f'product_max_price{category_name}', max_price, 60 * 2)
-        return products, max_price
+        django_cache.set(f'product_max_price{category_name}', maximum, 60 * 2)
+        return products, maximum
 
 
     @classmethod
