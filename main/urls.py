@@ -36,6 +36,7 @@ urlpatterns = [
     path('', include('users.urls')),
     path('', include('core.urls')),
     path('', include('products.urls')),
+    path('', include('payments.urls'))
 ]
 urlpatterns += staticfiles_urlpatterns()
 #urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

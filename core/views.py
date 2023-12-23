@@ -13,7 +13,6 @@ class HomeView(View):
     def get(self, request):
         user = cache.hgetall(f'user{request.session.get("_auth_user_id")}')
         header = cache.lrange('header_home', 0, -1)
-
         if not header:
             header = Header.filter_with_absolute_urls(request, 'home')
 

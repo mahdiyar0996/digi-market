@@ -17,10 +17,20 @@ services:
     image: "redis:7.0.8-alpine"
     restart: always
     container_name: "redis"
+    command: redis-server --requirepass b446c4229de28d4055ef3261266fa34a8b51bc571436673dea5a70f38c42eb09
     volumes:
       - "/var/lib/redis/:/var/lib/redis/"
+      - "./redis:/etc/redis/"
     expose:
       - 6379
+  redis-slave:
+    image: redis:7.0.8-alpine
+    container_name: slave
+    ports:
+      - "6380:6379"
+    command: redis-server --slaveof redis 6379 --requirepass b446c4229de28d4055ef3261266fa34a8b51bc571436673dea5a70f38c42eb09
+    depends_on:
+      - redis
   backend:
     build:
       context: .
@@ -34,6 +44,7 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: Mysql@0996
       REDIS_HOST: redis
+      REDIS_SLAVE_HOST: slave
       REDIS_PORT: 6379
       REDIS_DB: 1
     volumes:

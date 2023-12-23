@@ -7,9 +7,12 @@ DB_USER = os.environ.get('MYSQL_USER', 'root')
 DB_PASS = os.environ.get('MYSQL_PASSWORD', 'Mysql@0996')
 
 c_host = os.environ.get('REDIS_HOST', 'localhost')
+c_slave_host = os.environ.get('REDIS_SLAVE_HOST', 'localhost')
 c_port = os.environ.get('REDIS_PORT', '6379')
 c_db = os.environ.get('REDIS_DB', '1')
+c_password = 'b446c4229de28d4055ef3261266fa34a8b51bc571436673dea5a70f38c42eb09'
 CACHE_LOCATION = f"redis://{c_host}:{c_port}/{c_db}"
+CACHE_SLAVE_LOCATION = f'redis://{c_slave_host}:{c_port}/{c_db}'
 
 domain = 'localhost'
 port = 8000

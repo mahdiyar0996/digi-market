@@ -15,5 +15,5 @@ LABEL database="mysql"
 LABEL cache="redis"
 EXPOSE 8000
 RUN echo yes | python3 manage.py collectstatic
-CMD python3 manage.py migrate && gunicorn --bind 0.0.0.0:8000 main.wsgi:application
-#CMD python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000
+#CMD python3 manage.py migrate && gunicorn --bind 0.0.0.0:8000 main.wsgi:application
+CMD python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000
