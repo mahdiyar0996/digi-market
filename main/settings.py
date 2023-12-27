@@ -3,6 +3,8 @@ from pathlib import Path
 import os
 from redis import Redis
 from datetime import timedelta
+from django_redis import get_redis_connection
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -193,7 +195,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [CACHE_LOCATION,
-                     CACHE_SLAVE_LOCATION],
+                     ],
         "OPTIONS": {
             'MASTER_CACHE': CACHE_LOCATION,
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -213,12 +215,14 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = True    #when redis is down dont raise exceptio
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+# cache = get_redis_connection('default')
+
 try:
     cache = Redis(c_host, port=c_port, db=c_db, password=c_password, socket_timeout=5, decode_responses=True )
 except:
     cache = Redis(c_slave_host, port=c_port, db=c_db, password=c_password, socket_timeout=5, decode_responses=True)
 
-AUTH_PASSWORD_VALIDATORS = [
+# AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     # },
@@ -231,7 +235,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
-]
+# ]
 
 
 LANGUAGE_CODE = 'en-us'

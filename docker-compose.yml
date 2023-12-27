@@ -8,11 +8,16 @@ services:
     container_name: "db"
     restart: always
     volumes:
-      - "/home/mahdiyar/Desktop/digi-market/data:/var/lib/mysql"
+      - "./data:/var/lib/mysql"
     environment:
-      MYSQL_ROOT_PASSWORD: Mysql@0996
-      MYSQL_PASSWORD: Mysql@0996
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password     #mysql root password file
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password            #mysql password file
+#      MYSQL_ROOT_PASSWORD: Mysql@0996
+#      MYSQL_PASSWORD: Mysql@0996
       MYSQL_DATABASE: digi_market
+    secrets:
+      - mysql_root_password
+      - mysql_password
   redis:
     image: "redis:7.0.8-alpine"
     restart: always
@@ -39,14 +44,14 @@ services:
     restart: always
     container_name: "backend"
     environment:
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
-      MYSQL_USER: root
-      MYSQL_PASSWORD: Mysql@0996
+#      MYSQL_HOST: db
+#      MYSQL_PORT: 3306
+#      MYSQL_USER: root
+#      MYSQL_PASSWORD: Mysql@0996
       REDIS_HOST: redis
       REDIS_SLAVE_HOST: slave
       REDIS_PORT: 6379
-      REDIS_DB: 1
+      REDIS_DB: 0
     volumes:
       - ".:/app"
     ports:
@@ -71,3 +76,10 @@ networks:
   default:
     name: "server-net"
     internal: true
+
+
+secrets:       #tareef secrets
+  mysql_root_password:       #taeen secret name
+    file: docker/mysql_root_password.txt     #location docker secret file
+  mysql_password:            #taeen secret name
+    file: docker/mysql_password.txt          #location docker secret file
