@@ -65,6 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBase):
     is_superuser = models.BooleanField('ادمین', default=False, db_index=True)
     is_staff = models.BooleanField('کارکنان', default=False, db_index=True)
     ipaddress = models.GenericIPAddressField('ایپی ادرس', blank=True, null=True, db_index=True)
+    subscription = models.DurationField('اشتراک', blank=True, null=True)
     last_password_reset = models.DateTimeField(null=True, blank=True)
     objects = UserManager()
     USERNAME_FIELD = 'username'
